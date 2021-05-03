@@ -1,0 +1,39 @@
+{
+  "Init" : {
+    "TimerUS" : 1000,
+    "VideoMS" : 10,
+    "CPUFreq" : 10000000
+    },
+  "Commands": [ 
+    {
+      "Cycle":0,
+      "Type":"InsertFW",
+      "Data":"path to firmware"
+    },
+    {
+      "Cycle":1000,
+      "Type":"InsertCart",
+      "Data":"path to cartridge"
+    },
+    {
+      "Cycle":1500,
+      "Type":"DirectionUp",
+      "Data":""
+    },
+    {
+      "Cycle":2500,
+      "Type":"OutputRegs",
+      "Data":""
+    },
+    {
+      "Cycle":2500,
+      "Type":"OutputCSRs",
+      "Data":""
+    },
+    {
+      "Cycle":2500,
+      "Type":"OutputMem",
+      "Data":"0x7000000-0x7100000"
+    }
+  ]
+}  
