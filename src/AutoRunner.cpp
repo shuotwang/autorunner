@@ -2,6 +2,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "RISCVConsoleApplication.h"
 #include <iostream>
 #include <fstream>
 #include <cstdio>
@@ -9,13 +10,13 @@
 
 #include "CommandsResponder.h"
 
- 
-// using namespace rapidjson;
 
+int main(int argc, char *argv[]) {
 
- 
-int main() {
+    auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
+    return MainApp->Run(argc, argv);
 
+    /*
     FILE* fp = fopen("/Users/Vincent/Desktop/input.json", "r");
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
@@ -89,6 +90,7 @@ int main() {
             }
         }
     }
+    */
 
     // Reading finishes
     
