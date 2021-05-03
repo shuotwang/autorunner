@@ -14,9 +14,9 @@
 int main(int argc, char *argv[]) {
 
     auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
-    return MainApp->Run(argc, argv);
+    MainApp->Run(argc, argv);
 
-    /*
+    
     FILE* fp = fopen("/Users/Vincent/Desktop/input.json", "r");
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    */
+    
 
     // Reading finishes
     
