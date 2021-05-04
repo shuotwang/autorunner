@@ -14,10 +14,13 @@
 int main(int argc, char *argv[]) {
 
     auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
-    MainApp->Run(argc, argv);
-
     
-    FILE* fp = fopen("/Users/Vincent/Desktop/input.json", "r");
+    int timerUS = 0, videoMS = 0, CPUFreq = 0;
+    int cycle = 0;
+    std::string type = "";
+    std::string data = "";
+
+    FILE* fp = fopen("/code/autograder/src/input.json", "r");
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
     rapidjson::Document d;
@@ -26,7 +29,6 @@ int main(int argc, char *argv[]) {
 
     // Init
     if (d.HasMember("Init")) {
-        int timerUS = 0, videoMS = 0, CPUFreq = 0;
 
         const rapidjson::Value& Init = d["Init"];
         if (Init["TimerUS"].IsInt()) {
@@ -57,10 +59,6 @@ int main(int argc, char *argv[]) {
             for (size_t i = 0; i < len; i++) {
                 const rapidjson::Value& CMD = Commands[i];
 
-                int cycle = 0;
-                std::string type = "";
-                std::string data = "";
-
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
                     cycle = CMD["Cycle"].GetInt();
                 }
@@ -74,23 +72,16 @@ int main(int argc, char *argv[]) {
                     // TODO: get detailed data for OutputMem
                 }
 
-                // printf("[Commands]:\ncycle: %d, type: %s, data: %s\n", cycle, type.c_str(), data.c_str());
+                printf("[Commands]:\ncycle: %d, type: %s, data: %s\n", cycle, type.c_str(), data.c_str());
 
                 // TODO: Respond to Commands
                 if (cycle && !type.empty() && !data.empty()) {
                     sendCommand(cycle, type, data);
                 }
-                
-                
-                char *curPath = getenv("HOME");
-                if (curPath != NULL) {
-                    printf("current path is %s.\n", curPath);
-                }
-                
             }
         }
     }
-    
+    MainApp->Run(argc, argv);
 
     // Reading finishes
     

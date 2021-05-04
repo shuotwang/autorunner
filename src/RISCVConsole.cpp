@@ -161,6 +161,7 @@ bool CRISCVConsole::SystemStep(){
     DVideoTicks--;
     if(!DVideoTicks){
         if(DVideoController->Tick()){
+            DChipset->SetInterruptPending(CRISCVConsoleChipset::EInterruptSource::Video);
             DRefreshScreenBuffer.store(true);
         }
         DVideoTicks = uint64_t(DVideoDelayMS) * DDebugCPUFreq / 1000;
@@ -357,7 +358,7 @@ bool CRISCVConsole::VideoTimerTick(std::shared_ptr<CGraphicSurface> screensurfac
             DVideoTicks = DVideoDelayMS;
             if(DVideoController->Tick()){
                 DVideoController->Refresh(screensurface);
-                DChipset->SetInterruptPending(CRISCVConsoleChipset::EInterruptSource::Video);
+                
                 return true;
             }
         }

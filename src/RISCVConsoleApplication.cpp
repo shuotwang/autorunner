@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 std::shared_ptr< CRISCVConsoleApplication > CRISCVConsoleApplication::DApplicationPointer;
 
@@ -898,5 +899,7 @@ std::string CRISCVConsoleApplication::FormatHex32Bit(uint32_t val){
 
 int CRISCVConsoleApplication::Run(int argc, char *argv[]){
     ParseArguments(argc,argv);
-    return DApplication->Run(argc, argv);
+    // return DApplication->Run(argc, argv);
+    std::cout << "MainApp->Run" << std::endl;
+    return 0;
 }
