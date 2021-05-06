@@ -14,7 +14,8 @@
 int main(int argc, char *argv[]) {
 
     auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
-    
+    MainApp->Run(argc, argv);
+
     int timerUS = 0, videoMS = 0, CPUFreq = 0;
     int cycle = 0;
     std::string type = "";
@@ -43,12 +44,8 @@ int main(int argc, char *argv[]) {
             CPUFreq = Init["CPUFreq"].GetInt();
         }
 
-        
+        // TODO: do init operations
         printf("[Init]:\ntimerUS: %d, videoMS: %d, CPUFreq: %d\n", timerUS, videoMS, CPUFreq);
-        
-        
-        
-        
     }
     
     // Commands
@@ -75,14 +72,16 @@ int main(int argc, char *argv[]) {
                 printf("[Commands]:\ncycle: %d, type: %s, data: %s\n", cycle, type.c_str(), data.c_str());
 
                 // TODO: Respond to Commands
-                if (cycle && !type.empty() && !data.empty()) {
-                    sendCommand(cycle, type, data);
-                }
             }
         }
     }
-    MainApp->Run(argc, argv);
 
+    // pass the params into Commands Responder
+    if (cycle && !type.empty() && !data.empty()) {
+        sendCommand(cycle, type, data);
+    }
+
+    
     // Reading finishes
     
 }
