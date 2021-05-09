@@ -8,12 +8,12 @@
     {
       "Cycle":0,
       "Type":"InsertFW",
-      "Data":"path to firmware"
+      "Data":"/code/autograder/firmware/bin/phase2-firmware"
     },
     {
       "Cycle":1000,
       "Type":"InsertCart",
-      "Data":"path to cartridge"
+      "Data":"/code/autograder/cartridge/bin/phase2-cartridge"
     },
     {
       "Cycle":1500,
@@ -33,7 +33,7 @@
     {
       "Cycle":2500,
       "Type":"OutputMem",
-      "Data":"0x7000000-0x7100000"
+      "Data":"0x5000000-0x5100000"
     }
   ]
 }  

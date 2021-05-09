@@ -20,6 +20,10 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool DDebugMode = false;
         bool DFollowingInstruction = false;
 
+        // audograder
+        std::string FWFileName;
+        std::string CRFileName;
+
         std::shared_ptr<CGUIWindow> DMainWindow;
         std::shared_ptr<CGUIBox> DConsoleDebugBox;
         std::shared_ptr<CGUIBox> DConsoleBox;
@@ -133,6 +137,8 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool InstructionBoxScrollEvent(std::shared_ptr<CGUIScrollableLabelBox> widget);
         void BreakpointEvent();
 
+        bool FirmwareInsert();
+
         void CreateConsoleWidgets();
         void CreateControllerWidgets();
         void CreateSystemControlWidgets();
@@ -167,6 +173,10 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         static std::shared_ptr< CRISCVConsoleApplication > Instance(const std::string &appname);
         
         bool LoadInit(std::string key, std::string value);
+        bool LoadFW(std::string value);
+        bool LoadCR(std::string value);
+        bool TempTest();
+        
         int Run(int argc, char *argv[]);
 
 };

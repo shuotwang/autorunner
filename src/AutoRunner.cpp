@@ -3,23 +3,16 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "RISCVConsoleApplication.h"
+#include "AutoRunner.h"
 #include <iostream>
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
 
-#include "CommandsResponder.h"
-
-
 int main(int argc, char *argv[]) {
 
     auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
     MainApp->Run(argc, argv);
-
-    int TimerUS = 0, VideoMS = 0, CPUFreq = 0;
-    int Cycle = 0;
-    std::string Type = "";
-    std::string Data = "";
 
     FILE* fp = fopen("/code/autograder/src/input.json", "r");
     char readBuffer[65536];
@@ -30,6 +23,7 @@ int main(int argc, char *argv[]) {
 
     // Init
     if (d.HasMember("Init")) {
+        int TimerUS = 0, VideoMS = 0, CPUFreq = 0;
 
         const rapidjson::Value& Init = d["Init"];
         if (Init["TimerUS"].IsInt()) {
@@ -58,6 +52,11 @@ int main(int argc, char *argv[]) {
         if (Commands.IsArray()) {
             size_t len = Commands.Size();
             for (size_t i = 0; i < len; i++) {
+                    
+                int Cycle = 0;
+                std::string Type = "";
+                std::string Data = "";
+
                 const rapidjson::Value& CMD = Commands[i];
 
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
@@ -70,19 +69,70 @@ int main(int argc, char *argv[]) {
 
                 if (CMD.HasMember("Data") && CMD["Data"].IsString()) {
                     Data = CMD["Data"].GetString();
+                    Data = Data == "" ? "." : Data;
                     // TODO: get detailed data for OutputMem
                 }
-                // TODO: Respond to Commands
+
+                SendCommand(Cycle, Type, Data, MainApp);                    
             }
         }
     }
 
-    // pass the params into Commands Responder
-    if (Cycle && !Type.empty() && !Data.empty()) {
-        sendCommand(Cycle, Type, Data);
-    }
+    
+    
+}
 
-    
-    // Reading finishes
-    
+template <typename T> 
+bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp) {
+    if (Type == "InsertFW") {
+        InsertFW(MainApp, Data);
+    }else if (Type == "InsertCart") {
+        InsertCR(MainApp, Data);
+    }else if (Type == "DirectionUp"){
+        // upBtn();
+    }else if (Type == "DirectionDown") {
+        // downBtn();
+    }else if (Type == "DirectionLeft") {
+        // leftBtn();
+    }else if (Type == "DirectionRight") {
+        // rightBtn();
+    }else if (Type == "uBtn") {
+        // uBtn();
+    }else if (Type == "iBtn") {
+        // iBtn();
+    }else if (Type == "jBtn") {
+        // jBtn();
+    }else if (Type == "kbtn") {
+        // kBtn();
+    }else if (Type == "cmdBtn") {
+        // cmdBtn();
+    }else if (Type == "OutputRegs") {
+        // outputRegs();
+    }else if (Type == "OutputCSRs") {
+        // outputCSRs();
+    }else if (Type == "OutputMem") {
+        OutputMem(MainApp, Data);
+    }
+    return true;
+}
+
+
+template <typename T> 
+void InsertFW(T MainApp, std::string &Data){
+    if (!MainApp->LoadFW(Data)) {
+        std::cout << "Invalid FW Path" << std::endl;
+    }
+}
+
+template <typename T>
+void InsertCR(T MainApp, std::string &Data){
+    if (!MainApp->LoadCR(Data)) {
+        std::cout << "Invalid CR Path" << std::endl;
+    }
+}
+
+template <typename T> 
+bool OutputMem(T MainApp, std::string &Data) {
+    std::cout << "OutputMem" << std::endl;
+    return true;
 }

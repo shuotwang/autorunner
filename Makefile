@@ -34,7 +34,6 @@ CPPFLAGS += -std=c++14
 APP_NAME = autograder
 
 APP_OBJS = $(OBJ_DIR)/AutoRunner.o                    \
-    $(OBJ_DIR)/CommandsResponder.o            \
 	$(OBJ_DIR)/GraphicFactoryCairo.o            \
     $(OBJ_DIR)/GUIFactoryGTK3.o                 \
     $(OBJ_DIR)/GUIScrollableLabelBox.o          \

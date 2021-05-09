@@ -904,6 +904,55 @@ bool CRISCVConsoleApplication::LoadInit(std::string key, std::string value){
     return true;
 }
 
+bool CRISCVConsoleApplication::LoadFW(std::string value){
+    if (!value.empty()){
+        FWFileName = value;
+
+        auto InFile = std::make_shared<CFileDataSource>(FWFileName);
+        if(DRISCVConsole->ProgramFirmware(InFile)){
+            if(DDebugMode){
+                DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
+                DDebugInstructionComboBox->ClearItems();
+                for(auto &Label : DRISCVConsole->InstructionLabels()){
+                    DDebugInstructionComboBox->AppendItem(Label);
+                }
+                DFollowingInstruction = true;
+                RefreshDebugRegisters();
+            }
+            std::cout << "FW Loaded" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CRISCVConsoleApplication::LoadCR(std::string value){
+    if (!value.empty()){
+        CRFileName = value;
+
+        auto InFile = std::make_shared<CFileDataSource>(CRFileName);
+        if(DRISCVConsole->InsertCartridge(InFile)){
+            if(DDebugMode){
+                DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
+                DDebugInstructionComboBox->ClearItems();
+                for(auto &Label : DRISCVConsole->InstructionLabels()){
+                    DDebugInstructionComboBox->AppendItem(Label);
+                }
+                DFollowingInstruction = true;
+                RefreshDebugRegisters();
+            }
+            std::cout << "CR Loaded" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CRISCVConsoleApplication::TempTest() {
+    std::cout << "temptest" << std::endl;
+    return true;
+}
+
 int CRISCVConsoleApplication::Run(int argc, char *argv[]){
     ParseArguments(argc,argv);
     // return DApplication->Run(argc, argv);
