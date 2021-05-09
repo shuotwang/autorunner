@@ -166,6 +166,7 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         
         static std::shared_ptr< CRISCVConsoleApplication > Instance(const std::string &appname);
         
+        bool LoadInit(std::string key, std::string value);
         int Run(int argc, char *argv[]);
 
 };

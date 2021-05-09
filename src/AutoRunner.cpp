@@ -16,10 +16,10 @@ int main(int argc, char *argv[]) {
     auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
     MainApp->Run(argc, argv);
 
-    int timerUS = 0, videoMS = 0, CPUFreq = 0;
-    int cycle = 0;
-    std::string type = "";
-    std::string data = "";
+    int TimerUS = 0, VideoMS = 0, CPUFreq = 0;
+    int Cycle = 0;
+    std::string Type = "";
+    std::string Data = "";
 
     FILE* fp = fopen("/code/autograder/src/input.json", "r");
     char readBuffer[65536];
@@ -33,19 +33,23 @@ int main(int argc, char *argv[]) {
 
         const rapidjson::Value& Init = d["Init"];
         if (Init["TimerUS"].IsInt()) {
-            timerUS = Init["TimerUS"].GetInt(); 
+            TimerUS = Init["TimerUS"].GetInt(); 
         }
 
         if (Init["VideoMS"].IsInt()) {
-            videoMS = Init["VideoMS"].GetInt();
+            VideoMS = Init["VideoMS"].GetInt();
         }
 
         if (Init["CPUFreq"].IsInt()) {
             CPUFreq = Init["CPUFreq"].GetInt();
         }
 
-        // TODO: do init operations
-        printf("[Init]:\ntimerUS: %d, videoMS: %d, CPUFreq: %d\n", timerUS, videoMS, CPUFreq);
+        if (TimerUS != 0 && VideoMS != 0 && CPUFreq != 0) {
+            MainApp->LoadInit("TimerUS", std::to_string(TimerUS));
+            MainApp->LoadInit("VideoMS", std::to_string(VideoMS));
+            MainApp->LoadInit("CPUFreq", std::to_string(CPUFreq));
+        }
+
     }
     
     // Commands
@@ -57,28 +61,25 @@ int main(int argc, char *argv[]) {
                 const rapidjson::Value& CMD = Commands[i];
 
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
-                    cycle = CMD["Cycle"].GetInt();
+                    Cycle = CMD["Cycle"].GetInt();
                 }
 
                 if (CMD.HasMember("Type") && CMD["Type"].IsString()) {
-                    type = CMD["Type"].GetString();
+                    Type = CMD["Type"].GetString();
                 }
 
                 if (CMD.HasMember("Data") && CMD["Data"].IsString()) {
-                    data = CMD["Data"].GetString();
+                    Data = CMD["Data"].GetString();
                     // TODO: get detailed data for OutputMem
                 }
-
-                printf("[Commands]:\ncycle: %d, type: %s, data: %s\n", cycle, type.c_str(), data.c_str());
-
                 // TODO: Respond to Commands
             }
         }
     }
 
     // pass the params into Commands Responder
-    if (cycle && !type.empty() && !data.empty()) {
-        sendCommand(cycle, type, data);
+    if (Cycle && !Type.empty() && !Data.empty()) {
+        sendCommand(Cycle, Type, Data);
     }
 
     

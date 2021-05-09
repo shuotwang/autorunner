@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <cstdio>
+#include <iostream>
 
 CRISCVConsoleApplicationConfiguration::CRISCVConsoleApplicationConfiguration(){
     DParameterNames["UP_KEY"] = EParameter::UpKey;
@@ -48,15 +49,35 @@ CRISCVConsoleApplicationConfiguration::~CRISCVConsoleApplicationConfiguration(){
 bool CRISCVConsoleApplicationConfiguration::Load(std::shared_ptr< CDataSource> src){
     CCommentSkipLineDataSource InputSource(src,'#');
     std::string Line;
+
     while(InputSource.Read(Line)){
         if(Line.length()){
             std::stringstream Stream(Line);
             std::string Key, Value;
+
+            // std::cout << "Config" << Key << " " << Value << std::endl;
+
             Stream>>Key>>Value;
             auto Search = DParameterNames.find(Key);
             if((Search != DParameterNames.end())&&(Value.length())){
                 DParameters[Search->second] = Value;
             }
+        }
+    }
+    return true;
+}
+
+// autograder modification
+bool CRISCVConsoleApplicationConfiguration::LoadInit(std::string key, std::string value){
+    EParameter param;
+
+    if (!key.empty() && !value.empty()) {
+        if (key == "TimerUS") {
+            DParameters[EParameter::TimerUS] = value;
+        }else if (key == "VideoMS") {
+            DParameters[EParameter::ScreenTimer] = value;
+        }else if (key == "CPUFreq") {
+            DParameters[EParameter::CPUFrequency] = value;
         }
     }
     return true;

@@ -22,6 +22,9 @@ class CRISCVConsoleApplicationConfiguration{
         
         bool Load(std::shared_ptr< CDataSource> src);
 
+        // autograder modification
+        bool LoadInit(std::string key, std::string value);
+
         int64_t GetIntegerParameter(EParameter param) const;
         std::string GetStringParameter(EParameter param) const;
 

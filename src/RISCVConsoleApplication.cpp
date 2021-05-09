@@ -897,9 +897,16 @@ std::string CRISCVConsoleApplication::FormatHex32Bit(uint32_t val){
     return Stream.str();
 }
 
+bool CRISCVConsoleApplication::LoadInit(std::string key, std::string value){
+    if (!key.empty() && !value.empty()){
+        DConfiguration.LoadInit(key, value);
+    }
+    return true;
+}
+
 int CRISCVConsoleApplication::Run(int argc, char *argv[]){
     ParseArguments(argc,argv);
     // return DApplication->Run(argc, argv);
-    std::cout << "MainApp->Run" << std::endl;
     return 0;
 }
+
