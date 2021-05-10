@@ -1,3 +1,6 @@
+#ifndef AUTO_RUNNER_H
+#define AUTO_RUNNER_H
+
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/writer.h"
@@ -15,4 +18,13 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp);
 template <typename T> void InsertFW(T MainApp, std::string &Data);
 template <typename T> void InsertCR(T MainApp, std::string &Data);
 
+template <typename T> void PressDirection(T MainApp, int Cycle, std::string &Data);
+template <typename T> void UBtn(T MainApp, int Cycle, std::string &Data);
+template <typename T> void IBtn(T MainApp, int Cycle, std::string &Data);
+template <typename T> void JBtn(T MainApp, int Cycle, std::string &Data);
+template <typename T> void KBtn(T MainApp, int Cycle, std::string &Data);
+template <typename T> void CMDBtn(T MainApp, int Cycle, std::string &Data);
+
 template <typename T> bool OutputMem(T MainApp, std::string &Data);
+
+#endif

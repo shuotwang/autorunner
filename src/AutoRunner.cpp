@@ -88,23 +88,12 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp) {
         InsertFW(MainApp, Data);
     }else if (Type == "InsertCart") {
         InsertCR(MainApp, Data);
-    }else if (Type == "DirectionUp"){
-        // upBtn();
-    }else if (Type == "DirectionDown") {
-        // downBtn();
-    }else if (Type == "DirectionLeft") {
-        // leftBtn();
-    }else if (Type == "DirectionRight") {
-        // rightBtn();
-    }else if (Type == "uBtn") {
-        // uBtn();
-    }else if (Type == "iBtn") {
-        // iBtn();
-    }else if (Type == "jBtn") {
-        // jBtn();
-    }else if (Type == "kbtn") {
-        // kBtn();
-    }else if (Type == "cmdBtn") {
+    }else if (Type == "DirectionUp" || Type == "DirectionDown" || \
+                Type == "DirectionLeft" || Type == "DirectionRight"){
+        PressDirection(MainApp, Cycle, Type);
+    }else if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn") {
+        PressDirection(MainApp, Cycle, Type);
+    }else if (Type == "CMDBtn") {
         // cmdBtn();
     }else if (Type == "OutputRegs") {
         // outputRegs();
@@ -131,6 +120,20 @@ void InsertCR(T MainApp, std::string &Data){
     }
 }
 
+template <typename T> 
+void PressDirection(T MainApp, int Cycle, std::string &Type) {
+    MainApp->PressDirection(Cycle, Type);
+}
+
+template <typename T> 
+void PressButton(T MainApp, int Cycle, std::string &Type) {
+    MainApp->PressButton(Cycle, Type);
+}
+
+template <typename T> 
+void PressCommand(T MainApp, int Cycle) {
+    MainApp->PressCommand(Cycle);
+}
 template <typename T> 
 bool OutputMem(T MainApp, std::string &Data) {
     std::cout << "OutputMem" << std::endl;

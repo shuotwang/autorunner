@@ -137,8 +137,6 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool InstructionBoxScrollEvent(std::shared_ptr<CGUIScrollableLabelBox> widget);
         void BreakpointEvent();
 
-        bool FirmwareInsert();
-
         void CreateConsoleWidgets();
         void CreateControllerWidgets();
         void CreateSystemControlWidgets();
@@ -175,6 +173,9 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool LoadInit(std::string key, std::string value);
         bool LoadFW(std::string value);
         bool LoadCR(std::string value);
+        bool PressDirection(int cycle, std::string value);
+        bool PressButton(int cycle, std::string value);
+        bool PressCommand(int cycle);
         bool TempTest();
         
         int Run(int argc, char *argv[]);

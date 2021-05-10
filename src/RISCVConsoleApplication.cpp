@@ -897,6 +897,7 @@ std::string CRISCVConsoleApplication::FormatHex32Bit(uint32_t val){
     return Stream.str();
 }
 
+// autograder modification
 bool CRISCVConsoleApplication::LoadInit(std::string key, std::string value){
     if (!key.empty() && !value.empty()){
         DConfiguration.LoadInit(key, value);
@@ -946,6 +947,67 @@ bool CRISCVConsoleApplication::LoadCR(std::string value){
         }
     }
     return false;
+}
+
+bool CRISCVConsoleApplication::PressDirection(int cycle, std::string value) {
+    if (!value.empty()) {
+        if (value == "DirectionUp") {
+            for (int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Up);
+            }
+            return true;
+        } else if (value == "DirectionDown") {
+            for (int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Down);
+            }
+            return true;
+        } else if (value == "DirectionLeft") {
+            for (int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Left);
+            }
+            return true;
+        } else if (value == "DirectionRight") {
+            for (int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Right);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CRISCVConsoleApplication::PressButton(int cycle, std::string value) {
+    if (!value.empty()) {
+        if (value == "UBtn") {
+            for(int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button1);
+            }
+            return true;
+        }else if (value == "IBtn") {
+            for(int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button2);
+            }
+            return true;
+        }else if (value == "JBtn") {
+            for(int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button3);
+            }
+            return true;
+        }else if (value == "KBtn") {
+            for(int i = 0; i < cycle; i++) {
+                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button4);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CRISCVConsoleApplication::PressCommand(int cycle) {
+    for (int i = 0; i < cycle; i++) {
+        DRISCVConsole->PressCommand();
+    }
+    return true;
 }
 
 bool CRISCVConsoleApplication::TempTest() {
