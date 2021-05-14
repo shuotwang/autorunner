@@ -181,6 +181,10 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool OutputCSRs();
         bool OutputMem();
 
+        bool DoStep();
+        bool DoRun();
+        bool DoStop();
+
         bool TempTest();
         
         int Run(int argc, char *argv[]);

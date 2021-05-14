@@ -1022,6 +1022,20 @@ bool CRISCVConsoleApplication::OutputMem() {
     return true;
 }
 
+bool CRISCVConsoleApplication::DoStep() {
+    DRISCVConsole->Step();
+    return true;
+}
+
+bool CRISCVConsoleApplication::DoRun() {
+    DRISCVConsole->Run();
+    return true;
+}
+
+bool CRISCVConsoleApplication::DoStop() {
+    DRISCVConsole->Stop();
+    return true;
+}
 
 bool CRISCVConsoleApplication::TempTest() {
     std::cout << "temptest" << std::endl;
