@@ -173,9 +173,12 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool LoadInit(std::string key, std::string value);
         bool LoadFW(std::string value);
         bool LoadCR(std::string value);
-        bool PressDirection(int cycle, std::string value);
-        bool PressButton(int cycle, std::string value);
-        bool PressCommand(int cycle);
+        bool RemoveCR();
+        bool PressDirection(std::string value);
+        bool ReleaseDirection(std::string value);
+        bool PressNumber(std::string value);
+        bool ReleaseNumber(std::string value);
+        bool PressCommand();
 
         bool OutputRegs();
         bool OutputCSRs();
@@ -183,7 +186,9 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
 
         bool DoStep();
         bool DoRun();
-        bool DoStop();
+        bool DoRunToggle();
+        bool DoPower();
+        bool DoPowerToggle();
 
         bool TempTest();
         

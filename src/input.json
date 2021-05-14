@@ -16,7 +16,7 @@
       "Data":"/code/autograder/cartridge/bin/phase2-cartridge"
     },
     {
-      "Cycle":20,
+      "Cycle":1500,
       "Type":"DirectionUp",
       "Data":""
     },

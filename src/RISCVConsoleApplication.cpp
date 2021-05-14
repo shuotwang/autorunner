@@ -911,15 +911,6 @@ bool CRISCVConsoleApplication::LoadFW(std::string value){
 
         auto InFile = std::make_shared<CFileDataSource>(FWFileName);
         if(DRISCVConsole->ProgramFirmware(InFile)){
-            // if(DDebugMode){
-            //     DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
-            //     DDebugInstructionComboBox->ClearItems();
-            //     for(auto &Label : DRISCVConsole->InstructionLabels()){
-            //         DDebugInstructionComboBox->AppendItem(Label);
-            //     }
-            //     DFollowingInstruction = true;
-            //     RefreshDebugRegisters();
-            // }
             std::cout << "FW Loaded" << std::endl;
             return true;
         }
@@ -933,15 +924,6 @@ bool CRISCVConsoleApplication::LoadCR(std::string value){
 
         auto InFile = std::make_shared<CFileDataSource>(CRFileName);
         if(DRISCVConsole->InsertCartridge(InFile)){
-            // if(DDebugMode){
-            //     DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
-            //     DDebugInstructionComboBox->ClearItems();
-            //     for(auto &Label : DRISCVConsole->InstructionLabels()){
-            //         DDebugInstructionComboBox->AppendItem(Label);
-            //     }
-            //     DFollowingInstruction = true;
-            //     RefreshDebugRegisters();
-            // }
             std::cout << "CR Loaded" << std::endl;
             return true;
         }
@@ -949,34 +931,50 @@ bool CRISCVConsoleApplication::LoadCR(std::string value){
     return false;
 }
 
-bool CRISCVConsoleApplication::PressDirection(int cycle, std::string value) {
+bool CRISCVConsoleApplication::RemoveCR() {
+    DRISCVConsole->RemoveCartridge();
+    return true;
+}
+
+bool CRISCVConsoleApplication::PressDirection(std::string value) {
     if (!value.empty()) {
         if (value == "DirectionUp") {
-            for (int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Up);
-            }
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Up);
             return true;
         } else if (value == "DirectionDown") {
-            for (int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Down);
-            }
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Down);
             return true;
         } else if (value == "DirectionLeft") {
-            for (int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Left);
-            }
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Left);
             return true;
         } else if (value == "DirectionRight") {
-            for (int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Right);
-            }
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Right);
             return true;
         }
     }
     return false;
 }
 
-bool CRISCVConsoleApplication::PressButton(int cycle, std::string value) {
+bool CRISCVConsoleApplication::ReleaseDirection(std::string value) {
+    if (!value.empty()) {
+        if (value == "DirectionUp") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Up);
+            return true;
+        } else if (value == "DirectionDown") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Down);
+            return true;
+        } else if (value == "DirectionLeft") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Left);
+            return true;
+        } else if (value == "DirectionRight") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Right);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CRISCVConsoleApplication::PressNumber(std::string value) {
     if (!value.empty()) {
         if (value == "UBtn") {
             DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button1);
@@ -995,7 +993,26 @@ bool CRISCVConsoleApplication::PressButton(int cycle, std::string value) {
     return false;
 }
 
-bool CRISCVConsoleApplication::PressCommand(int cycle) {
+bool CRISCVConsoleApplication::ReleaseNumber(std::string value) {
+    if (!value.empty()) {
+        if (value == "UBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button1);
+            return true;
+        }else if (value == "IBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button2);
+            return true;
+        }else if (value == "JBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button3);
+            return true;
+        }else if (value == "KBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button4);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CRISCVConsoleApplication::PressCommand() {
     DRISCVConsole->PressCommand();
     return true;
 }
@@ -1032,9 +1049,19 @@ bool CRISCVConsoleApplication::DoRun() {
     return true;
 }
 
-bool CRISCVConsoleApplication::DoStop() {
+bool CRISCVConsoleApplication::DoRunToggle() {
     DRISCVConsole->Stop();
     return true;
+}
+
+bool CRISCVConsoleApplication::DoPower() {
+    DRISCVConsole->PowerOn();
+    return true;
+}
+
+bool CRISCVConsoleApplication::DoPowerToggle() {
+    DRISCVConsole->PowerOff();
+    retrun true;
 }
 
 bool CRISCVConsoleApplication::TempTest() {
