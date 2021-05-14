@@ -176,6 +176,11 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool PressDirection(int cycle, std::string value);
         bool PressButton(int cycle, std::string value);
         bool PressCommand(int cycle);
+
+        bool OutputRegs();
+        bool OutputCSRs();
+        bool OutputMem();
+
         bool TempTest();
         
         int Run(int argc, char *argv[]);

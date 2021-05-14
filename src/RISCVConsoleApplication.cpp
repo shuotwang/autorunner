@@ -850,30 +850,30 @@ uint32_t CRISCVConsoleApplication::GetCPUFrequency(){
 }
 
 void CRISCVConsoleApplication::RefreshDebugRegisters(){
-    for(size_t Index = 0; Index < CRISCVCPU::RegisterCount(); Index++){
-        DGeneralRegisterValueLabels[Index]->SetText(FormatHex32Bit(DRISCVConsole->CPU()->Register(Index)));
-    }
-    auto PC = DRISCVConsole->CPU()->ProgramCounter();
-    DProgramCounterValueLabel->SetText(FormatHex32Bit(PC));
-    size_t LineIndex = 0;
-    for(auto CSRAddr : DRISCVConsole->CPU()->ControlStatusRegisterKeys()){
-        auto NewLine = DDebugCSRegisters->GetBufferedLine(LineIndex);
-        NewLine.replace(NewLine.length() - 8, 8, FormatHex32Bit(DRISCVConsole->CPU()->ControlStatusRegister(CSRAddr)));
-        DDebugCSRegisters->UpdateBufferedLine(LineIndex,NewLine);
-        LineIndex++;
-    }
-    if(DDebugMemoryStackButton->GetActive()){
-        auto RegisterBase = DRISCVConsole->CPU()->Register(DDebugMemoryStackPointerRegisterIndex);
-        DDebugMemory->SetBaseAddress(RegisterBase,false);
-    }
-    DDebugMemory->Refresh();
-    LineIndex = DRISCVConsole->InstructionAddressesToIndices(PC);
-    DDebugInstructions->HighlightBufferedLine(LineIndex);
-    if(DFollowingInstruction){
-        if((DDebugInstructions->GetBaseLine() > LineIndex)||(DDebugInstructions->GetBaseLine() + DDebugInstructions->GetLineCount()/2 <= LineIndex)){
-            DDebugInstructions->SetBaseLine(LineIndex < DDebugInstructions->GetLineCount()/2 ? 0 : LineIndex - (DDebugInstructions->GetLineCount()/2 - 1));
-        }
-    }
+    // for(size_t Index = 0; Index < CRISCVCPU::RegisterCount(); Index++){
+    //     DGeneralRegisterValueLabels[Index]->SetText(FormatHex32Bit(DRISCVConsole->CPU()->Register(Index)));
+    // }
+    // auto PC = DRISCVConsole->CPU()->ProgramCounter();
+    // DProgramCounterValueLabel->SetText(FormatHex32Bit(PC));
+    // size_t LineIndex = 0;
+    // for(auto CSRAddr : DRISCVConsole->CPU()->ControlStatusRegisterKeys()){
+    //     auto NewLine = DDebugCSRegisters->GetBufferedLine(LineIndex);
+    //     NewLine.replace(NewLine.length() - 8, 8, FormatHex32Bit(DRISCVConsole->CPU()->ControlStatusRegister(CSRAddr)));
+    //     DDebugCSRegisters->UpdateBufferedLine(LineIndex,NewLine);
+    //     LineIndex++;
+    // }
+    // if(DDebugMemoryStackButton->GetActive()){
+    //     auto RegisterBase = DRISCVConsole->CPU()->Register(DDebugMemoryStackPointerRegisterIndex);
+    //     DDebugMemory->SetBaseAddress(RegisterBase,false);
+    // }
+    // DDebugMemory->Refresh();
+    // LineIndex = DRISCVConsole->InstructionAddressesToIndices(PC);
+    // DDebugInstructions->HighlightBufferedLine(LineIndex);
+    // if(DFollowingInstruction){
+    //     if((DDebugInstructions->GetBaseLine() > LineIndex)||(DDebugInstructions->GetBaseLine() + DDebugInstructions->GetLineCount()/2 <= LineIndex)){
+    //         DDebugInstructions->SetBaseLine(LineIndex < DDebugInstructions->GetLineCount()/2 ? 0 : LineIndex - (DDebugInstructions->GetLineCount()/2 - 1));
+    //     }
+    // }
 }
 
 void CRISCVConsoleApplication::ParseArguments(int &argc, char *argv[]){
@@ -911,15 +911,15 @@ bool CRISCVConsoleApplication::LoadFW(std::string value){
 
         auto InFile = std::make_shared<CFileDataSource>(FWFileName);
         if(DRISCVConsole->ProgramFirmware(InFile)){
-            if(DDebugMode){
-                DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
-                DDebugInstructionComboBox->ClearItems();
-                for(auto &Label : DRISCVConsole->InstructionLabels()){
-                    DDebugInstructionComboBox->AppendItem(Label);
-                }
-                DFollowingInstruction = true;
-                RefreshDebugRegisters();
-            }
+            // if(DDebugMode){
+            //     DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
+            //     DDebugInstructionComboBox->ClearItems();
+            //     for(auto &Label : DRISCVConsole->InstructionLabels()){
+            //         DDebugInstructionComboBox->AppendItem(Label);
+            //     }
+            //     DFollowingInstruction = true;
+            //     RefreshDebugRegisters();
+            // }
             std::cout << "FW Loaded" << std::endl;
             return true;
         }
@@ -933,15 +933,15 @@ bool CRISCVConsoleApplication::LoadCR(std::string value){
 
         auto InFile = std::make_shared<CFileDataSource>(CRFileName);
         if(DRISCVConsole->InsertCartridge(InFile)){
-            if(DDebugMode){
-                DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
-                DDebugInstructionComboBox->ClearItems();
-                for(auto &Label : DRISCVConsole->InstructionLabels()){
-                    DDebugInstructionComboBox->AppendItem(Label);
-                }
-                DFollowingInstruction = true;
-                RefreshDebugRegisters();
-            }
+            // if(DDebugMode){
+            //     DDebugInstructions->SetBufferedLines(DRISCVConsole->InstructionStrings());
+            //     DDebugInstructionComboBox->ClearItems();
+            //     for(auto &Label : DRISCVConsole->InstructionLabels()){
+            //         DDebugInstructionComboBox->AppendItem(Label);
+            //     }
+            //     DFollowingInstruction = true;
+            //     RefreshDebugRegisters();
+            // }
             std::cout << "CR Loaded" << std::endl;
             return true;
         }
@@ -979,24 +979,16 @@ bool CRISCVConsoleApplication::PressDirection(int cycle, std::string value) {
 bool CRISCVConsoleApplication::PressButton(int cycle, std::string value) {
     if (!value.empty()) {
         if (value == "UBtn") {
-            for(int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button1);
-            }
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button1);
             return true;
         }else if (value == "IBtn") {
-            for(int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button2);
-            }
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button2);
             return true;
         }else if (value == "JBtn") {
-            for(int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button3);
-            }
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button3);
             return true;
         }else if (value == "KBtn") {
-            for(int i = 0; i < cycle; i++) {
-                DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button4);
-            }
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button4);
             return true;
         }
     }
@@ -1004,11 +996,32 @@ bool CRISCVConsoleApplication::PressButton(int cycle, std::string value) {
 }
 
 bool CRISCVConsoleApplication::PressCommand(int cycle) {
-    for (int i = 0; i < cycle; i++) {
-        DRISCVConsole->PressCommand();
+    DRISCVConsole->PressCommand();
+    return true;
+}
+
+bool CRISCVConsoleApplication::OutputRegs(){
+    for(size_t Index = 0; Index < CRISCVCPU::RegisterCount(); Index++){
+        std::cout << "REG"<<Index<<":"<<FormatHex32Bit(DRISCVConsole->CPU()->Register(Index))<< std::endl;;
     }
     return true;
 }
+
+bool CRISCVConsoleApplication::OutputCSRs() {
+    size_t LineIndex = 0;
+    for(auto CSRAddr : DRISCVConsole->CPU()->ControlStatusRegisterKeys()){
+        
+        std::cout << "CSR" << LineIndex << ":" << FormatHex32Bit(DRISCVConsole->CPU()->ControlStatusRegister(CSRAddr)) << std::endl;
+        
+        LineIndex++;
+    }
+    return true;
+}
+
+bool CRISCVConsoleApplication::OutputMem() {
+    return true;
+}
+
 
 bool CRISCVConsoleApplication::TempTest() {
     std::cout << "temptest" << std::endl;

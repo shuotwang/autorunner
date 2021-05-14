@@ -25,6 +25,9 @@ template <typename T> void JBtn(T MainApp, int Cycle, std::string &Data);
 template <typename T> void KBtn(T MainApp, int Cycle, std::string &Data);
 template <typename T> void CMDBtn(T MainApp, int Cycle, std::string &Data);
 
-template <typename T> bool OutputMem(T MainApp, std::string &Data);
+template <typename T> void OutputRegs(T MainApp);
+template <typename T> void OutputCSRs(T MainApp);
+template <typename T> void OutputMem(T MainApp);
+
 
 #endif

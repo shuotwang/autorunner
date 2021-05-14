@@ -94,13 +94,13 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp) {
     }else if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn") {
         PressDirection(MainApp, Cycle, Type);
     }else if (Type == "CMDBtn") {
-        // cmdBtn();
+        PressCommand(MainApp, Cycle);
     }else if (Type == "OutputRegs") {
-        // outputRegs();
+        OutputRegs(MainApp);
     }else if (Type == "OutputCSRs") {
-        // outputCSRs();
+        OutputCSRs(MainApp);
     }else if (Type == "OutputMem") {
-        OutputMem(MainApp, Data);
+        OutputMem(MainApp);
     }
     return true;
 }
@@ -134,8 +134,15 @@ template <typename T>
 void PressCommand(T MainApp, int Cycle) {
     MainApp->PressCommand(Cycle);
 }
-template <typename T> 
-bool OutputMem(T MainApp, std::string &Data) {
-    std::cout << "OutputMem" << std::endl;
-    return true;
+
+template <typename T> void OutputRegs(T MainApp){
+    MainApp->OutputRegs();
+}
+
+template <typename T> void OutputCSRs(T MainApp){
+    MainApp->OutputCSRs();
+}
+
+template <typename T> void OutputMem(T MainApp){
+    MainApp->OutputMem();
 }
