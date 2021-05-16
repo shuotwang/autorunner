@@ -7,6 +7,8 @@
 #include "GraphicFactory.h"
 #include "RISCVConsole.h"
 #include "RISCVConsoleApplicationConfig.h"
+#include "MemoryDevice.h"
+#include "MemoryControllerDevice.h"
 #include <unordered_map>
 
 class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConsoleApplication>{
@@ -16,6 +18,10 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         static std::shared_ptr< CRISCVConsoleApplication > DApplicationPointer;
         std::shared_ptr<CGUIApplication> DApplication;
         CRISCVConsoleApplicationConfiguration DConfiguration;
+
+        // autograder update
+        std::shared_ptr< CMemoryControllerDevice > DMemoryDevice;
+
         bool DDeleted = false;
         bool DDebugMode = false;
         bool DFollowingInstruction = false;
@@ -163,6 +169,7 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         void ParseArguments(int &argc, char *argv[]);
 
         static std::string FormatHex32Bit(uint32_t val);
+        
 
     public:
         explicit CRISCVConsoleApplication(const std::string &appname, const SPrivateConstructionType &key);
@@ -182,7 +189,7 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
 
         bool OutputRegs();
         bool OutputCSRs();
-        bool OutputMem();
+        bool OutputMem(uint32_t addr, uint32_t bytes);
 
         bool DoStep();
         bool DoRun();

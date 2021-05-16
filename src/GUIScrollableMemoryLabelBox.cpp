@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cctype>
+#include <iostream>
 
 const uint CGUIScrollableMemoryLabelBox::DBytesPerLine = 16;
 
@@ -99,6 +100,7 @@ void CGUIScrollableMemoryLabelBox::RefreshLabels(){
 
 void CGUIScrollableMemoryLabelBox::UpdateMemoryLine(size_t index, uint32_t addr, uint32_t bytes){
     DLabels[index]->SetText(FormatMemoryLine(DMemoryDevice->LoadData(addr,bytes),addr,bytes));
+    
 }
 
 std::string CGUIScrollableMemoryLabelBox::FormatMemoryLine(const uint8_t *buffer, uint32_t addr, uint32_t bytes){

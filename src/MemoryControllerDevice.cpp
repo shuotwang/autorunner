@@ -1,5 +1,6 @@
 #include "MemoryControllerDevice.h"
 #include <cstdio>
+#include <iostream>
 
 static const uint32_t CMemoryControllerDeviceIndexBits = 4;
 static const uint32_t CMemoryControllerDeviceIndices = 1<<CMemoryControllerDeviceIndexBits;

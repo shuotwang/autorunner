@@ -1035,7 +1035,20 @@ bool CRISCVConsoleApplication::OutputCSRs() {
     return true;
 }
 
-bool CRISCVConsoleApplication::OutputMem() {
+bool CRISCVConsoleApplication::OutputMem(uint32_t addr, uint32_t bytes) {
+    std::stringstream Stream;
+    std::cout << "here 1" << std::endl;
+    std::cout << DMemoryDevice->LoadData(addr, bytes) << std::endl;
+    const uint8_t *buffer = DMemoryDevice->LoadData(addr, bytes);
+    std::cout << "here2" << std::endl;
+
+    for(uint32_t Index = 0; Index < bytes; Index++){
+        Stream<<" "<<std::setfill('0') << std::setw(2) << std::hex << uint32_t(buffer[Index]);
+    }
+
+    std::cout << "here3" << std::endl;
+    std::cout << Stream.str() << std::endl;
+
     return true;
 }
 
@@ -1061,7 +1074,7 @@ bool CRISCVConsoleApplication::DoPower() {
 
 bool CRISCVConsoleApplication::DoPowerToggle() {
     DRISCVConsole->PowerOff();
-    retrun true;
+    return true;
 }
 
 bool CRISCVConsoleApplication::TempTest() {

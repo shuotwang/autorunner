@@ -88,13 +88,14 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp) {
         InsertFW(MainApp, Data);
     }else if (Type == "InsertCart") {
         InsertCR(MainApp, Data);
+        DoRun(MainApp);
     }else if (Type == "DirectionUp" || Type == "DirectionDown" || \
                 Type == "DirectionLeft" || Type == "DirectionRight"){
         PressDirection(MainApp, Cycle, Type);
     }else if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn") {
         PressDirection(MainApp, Cycle, Type);
     }else if (Type == "CMDBtn") {
-        PressCommand(MainApp, Cycle);
+        PressCommand(MainApp);
     }else if (Type == "OutputRegs") {
         OutputRegs(MainApp);
     }else if (Type == "OutputCSRs") {
@@ -120,9 +121,18 @@ void InsertCR(T MainApp, std::string &Data){
     }
 }
 
+template <typename T> void RemoveCR(T MainApp) {
+    MainApp->RemoveCR();
+}
+
 template <typename T> 
-void PressDirection(T MainApp, int Cycle, std::string &Type) {
-    MainApp->PressDirection(Cycle, Type);
+void PressDirection(T MainApp, int Cycle, std::string &Data){
+    MainApp->PressDirection(Data);
+}
+
+template <typename T> 
+void ReleaseDirection(T MainApp, std::string &Data) {
+    MainApp->ReleaseDirection(Data);
 }
 
 template <typename T> 
@@ -130,9 +140,14 @@ void PressButton(T MainApp, int Cycle, std::string &Type) {
     MainApp->PressButton(Cycle, Type);
 }
 
+template <typename T>
+void ReleaseButton(T MainApp, std::string &Data) {
+    MainApp->ReleaseNumber(Data);
+}
+
 template <typename T> 
-void PressCommand(T MainApp, int Cycle) {
-    MainApp->PressCommand(Cycle);
+void PressCommand(T MainApp) {
+    MainApp->PressCommand();
 }
 
 template <typename T> void OutputRegs(T MainApp){
@@ -144,5 +159,29 @@ template <typename T> void OutputCSRs(T MainApp){
 }
 
 template <typename T> void OutputMem(T MainApp){
-    MainApp->OutputMem();
+    uint32_t addr = 0;
+    uint32_t bytes = 16;
+    MainApp->OutputMem(addr, bytes);
+}
+
+template <typename T> void DoStep(T MainApp) {
+    MainApp->DoStep();
+}
+
+template <typename T> void DoRun(T MainApp) {
+    if(!MainApp->DoRun()) {
+        std::cout << "Run Not Working" << std::endl;
+    }
+}
+
+template <typename T> void DoRunToggle(T MainApp) {
+    MainApp->DoRunToggle();
+}
+
+template <typename T> void DoPower(T MainApp) {
+    MainApp->DoPower();
+}
+
+template <typename T> void DoPowerToggle(T MainApp) {
+    MainApp->DoPowerToggle();
 }
