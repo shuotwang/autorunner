@@ -19,9 +19,6 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         std::shared_ptr<CGUIApplication> DApplication;
         CRISCVConsoleApplicationConfiguration DConfiguration;
 
-        // autograder update
-        std::shared_ptr< CMemoryControllerDevice > DMemoryDevice;
-
         bool DDeleted = false;
         bool DDebugMode = false;
         bool DFollowingInstruction = false;

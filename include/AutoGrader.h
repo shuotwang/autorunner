@@ -11,6 +11,13 @@
 #include <cstdio>
 #include <cstdlib>
 
+// class AutoGrader {
+//     protected:
+//         std::string InputJsonPath;
+
+// };
+
+
 
 template <typename T> 
 bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp);

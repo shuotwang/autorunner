@@ -3,7 +3,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "RISCVConsoleApplication.h"
-#include "AutoRunner.h"
+#include "AutoGrader.h"
 #include <iostream>
 #include <fstream>
 #include <cstdio>
@@ -88,12 +88,12 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp) {
         InsertFW(MainApp, Data);
     }else if (Type == "InsertCart") {
         InsertCR(MainApp, Data);
-        DoRun(MainApp);
+        DoPower(MainApp);
     }else if (Type == "DirectionUp" || Type == "DirectionDown" || \
                 Type == "DirectionLeft" || Type == "DirectionRight"){
         PressDirection(MainApp, Cycle, Type);
     }else if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn") {
-        PressDirection(MainApp, Cycle, Type);
+        PressButton(MainApp, Cycle, Type);
     }else if (Type == "CMDBtn") {
         PressCommand(MainApp);
     }else if (Type == "OutputRegs") {
@@ -136,8 +136,8 @@ void ReleaseDirection(T MainApp, std::string &Data) {
 }
 
 template <typename T> 
-void PressButton(T MainApp, int Cycle, std::string &Type) {
-    MainApp->PressButton(Cycle, Type);
+void PressButton(T MainApp, int Cycle, std::string &Data) {
+    MainApp->PressNumber(Data);
 }
 
 template <typename T>
@@ -160,7 +160,7 @@ template <typename T> void OutputCSRs(T MainApp){
 
 template <typename T> void OutputMem(T MainApp){
     uint32_t addr = 0;
-    uint32_t bytes = 16;
+    uint32_t bytes = 32;
     MainApp->OutputMem(addr, bytes);
 }
 
