@@ -9,6 +9,7 @@
 #include "RISCVConsoleApplicationConfig.h"
 #include "MemoryDevice.h"
 #include "MemoryControllerDevice.h"
+#include <map>
 #include <unordered_map>
 
 class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConsoleApplication>{
@@ -26,6 +27,7 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         // audograder
         std::string FWFileName;
         std::string CRFileName;
+        static std::unordered_map<uint32_t, std::string> CSRMap;
 
         std::shared_ptr<CGUIWindow> DMainWindow;
         std::shared_ptr<CGUIBox> DConsoleDebugBox;
@@ -184,9 +186,10 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool ReleaseNumber(std::string value);
         bool PressCommand();
 
-        bool OutputRegs();
-        bool OutputCSRs();
-        bool OutputMem(uint32_t addr, uint32_t bytes);
+        std::map<std::string, std::string> OutputRegs(int cycle);
+        std::map<std::string, std::string> OutputCSRs(int Cycle);
+        std::string OutputMem(uint32_t addr, uint32_t bytes, int Cycle);
+        bool OutputInfo(uint32_t addr, uint32_t bytes, int Cycle);
 
         bool DoStep();
         bool DoRun();

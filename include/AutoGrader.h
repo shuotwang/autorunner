@@ -10,17 +10,11 @@
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
-
-// class AutoGrader {
-//     protected:
-//         std::string InputJsonPath;
-
-// };
-
+#include <map>
 
 
 template <typename T> 
-bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp);
+bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator);
 
 template <typename T> void InsertFW(T MainApp, std::string &Data);
 template <typename T> void InsertCR(T MainApp, std::string &Data);
@@ -32,15 +26,19 @@ template <typename T> void PressButton(T MainApp, int Cycle, std::string &Type);
 template <typename T> void ReleaseButton(T MainApp, std::string &Data);
 template <typename T> void CMDBtn(T MainApp, int Cycle, std::string &Data);
 
-template <typename T> void OutputRegs(T MainApp);
-template <typename T> void OutputCSRs(T MainApp);
-template <typename T> void OutputMem(T MainApp);
+template <typename T> std::map<std::string, std::string> OutputRegs(T MainApp, int Cycle);
+template <typename T> std::map<std::string, std::string> OutputCSRs(T MainApp, int Cycle);
+template <typename T> std::map<std::string, std::string> OutputMem(T MainApp, std::string &Data, int Cycle);
 
 template <typename T> void DoStep(T MainApp);
 template <typename T> void DoRun(T MainApp);
 template <typename T> void DoRunToggle(T MainApp);
 template <typename T> void DoPower(T MainApp);
 template <typename T> void DoPowerToggle(T MainApp);
+
+rapidjson::Value FormatOutputMap(std::map<std::string, std::string> Map, rapidjson::Document::AllocatorType &Allocator);
+
+uint32_t GetAddHex(std::string strAdd);
 
 
 #endif

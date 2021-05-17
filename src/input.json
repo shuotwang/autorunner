@@ -11,12 +11,12 @@
       "Data":"/code/autograder/firmware/bin/phase2-firmware"
     },
     {
-      "Cycle":1000,
+      "Cycle":0,
       "Type":"InsertCart",
       "Data":"/code/autograder/cartridge/bin/phase2-cartridge"
     },
     {
-      "Cycle":1500,
+      "Cycle":2,
       "Type":"DirectionUp",
       "Data":""
     },
@@ -33,7 +33,7 @@
     {
       "Cycle":2500,
       "Type":"OutputMem",
-      "Data":"0x5000000-0x5100000"
+      "Data":"0x500B4000-0x500F4000"
     }
   ]
 }  
