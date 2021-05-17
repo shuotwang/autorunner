@@ -33,7 +33,7 @@
     {
       "Cycle":2500,
       "Type":"OutputMem",
-      "Data":"0x500B4000-0x500F4000"
+      "Data":"0x500B4000-0x500B4002"
     }
   ]
 }  

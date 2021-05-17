@@ -5,7 +5,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/memorystream.h"
-
+#include "rapidjson/filewritestream.h"
 #include "RISCVConsoleApplication.h"
 #include "AutoGrader.h"
 #include <iostream>
@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     rapidjson::Document output;
     output.SetObject();
     rapidjson::Document::AllocatorType& allocator = output.GetAllocator();
+    rapidjson::Value valueObjectArray(rapidjson::kArrayType);
 
 
     // Init
@@ -79,6 +80,7 @@ int main(int argc, char *argv[]) {
                         for (int i = 0; i < (CurrentCycle - Cycle); i++){
                             MainApp->DoStep();
                         }
+                        Cycle = CurrentCycle;
                     }
                 }
 
@@ -92,17 +94,23 @@ int main(int argc, char *argv[]) {
                     // TODO: get detailed data for OutputMem
                 }
 
-                SendCommand(Cycle, Type, Data, MainApp, allocator);                    
+                SendCommand(Cycle, Type, Data, MainApp, allocator, valueObjectArray);                    
             }
         }
     }
 
-    
-    
+    output.AddMember("Outputs", valueObjectArray, allocator);
+    FILE* f = fopen("/code/autograder/src/output.json", "w");
+	char writeBuffer[65535];
+	rapidjson::FileWriteStream os(f, writeBuffer, sizeof(writeBuffer));
+
+	rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
+	output.Accept(writer);
+	fclose(f);
 }
 
 template <typename T> 
-bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator) {
+bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray) {
     if (Type == "InsertFW") {
         InsertFW(MainApp, Data);
     }else if (Type == "InsertCart") {
@@ -118,12 +126,24 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rap
     }else if (Type == "OutputRegs") {
         std::map<std::string, std::string> outRegs = OutputRegs(MainApp, Cycle);
         rapidjson::Value outRegJsonVal = FormatOutputMap(outRegs, Allocator);
+        rapidjson::Value temp(rapidjson::kObjectType);
+        temp.AddMember("Cycle", Cycle, Allocator);
+        temp.AddMember("Regs", outRegJsonVal, Allocator);
+        valueObjectArray.PushBack(temp, Allocator);
     }else if (Type == "OutputCSRs") {
         std::map<std::string, std::string> outCSRs = OutputCSRs(MainApp, Cycle);
         rapidjson::Value outCSRJsonVal = FormatOutputMap(outCSRs, Allocator);
+        rapidjson::Value temp(rapidjson::kObjectType);
+        temp.AddMember("Cycle", Cycle, Allocator);
+        temp.AddMember("CSRs", outCSRJsonVal, Allocator);
+        valueObjectArray.PushBack(temp, Allocator);
     }else if (Type == "OutputMem") {
         std::map<std::string, std::string> outMem = OutputMem(MainApp, Data, Cycle);
         rapidjson::Value outMemJsonVal = FormatOutputMap(outMem, Allocator);
+        rapidjson::Value temp(rapidjson::kObjectType);
+        temp.AddMember("Cycle", Cycle, Allocator);
+        temp.AddMember("Mem", outMemJsonVal, Allocator);
+        valueObjectArray.PushBack(temp, Allocator);
     }
     return true;
 }

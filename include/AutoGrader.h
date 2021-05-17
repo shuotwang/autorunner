@@ -14,7 +14,7 @@
 
 
 template <typename T> 
-bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator);
+bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray);
 
 template <typename T> void InsertFW(T MainApp, std::string &Data);
 template <typename T> void InsertCR(T MainApp, std::string &Data);
