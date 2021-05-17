@@ -8,15 +8,15 @@
     {
       "Cycle":0,
       "Type":"InsertFW",
-      "Data":"path to firmware"
+      "Data":"/code/autograder/files/firmware"
+    },
+    {
+      "Cycle":0,
+      "Type":"InsertCart",
+      "Data":"/code/autograder/files/cartridge"
     },
     {
       "Cycle":1000,
-      "Type":"InsertCart",
-      "Data":"path to cartridge"
-    },
-    {
-      "Cycle":1500,
       "Type":"DirectionUp",
       "Data":""
     },
@@ -33,7 +33,17 @@
     {
       "Cycle":2500,
       "Type":"OutputMem",
-      "Data":"0x7000000-0x7100000"
+      "Data":"0x500FE110-0x500FE11F"
+    },
+    {
+      "Cycle":3500,
+      "Type":"DirectionDown",
+      "Data":""
+    },
+    {
+      "Cycle":3500,
+      "Type":"OutputMem",
+      "Data":"0x500FE110-0x500FE11F"
     }
   ]
 }  

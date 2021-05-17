@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     MainApp->Run(argc, argv);
 
     // Input
-    FILE* fp = fopen("/code/autograder/src/input.json", "r");
+    FILE* fp = fopen("/code/autograder/files/input.json", "r");
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
     rapidjson::Document d;
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     }
 
     output.AddMember("Outputs", valueObjectArray, allocator);
-    FILE* f = fopen("/code/autograder/src/output.json", "w");
+    FILE* f = fopen("/code/autograder/files/output.json", "w");
 	char writeBuffer[65535];
 	rapidjson::FileWriteStream os(f, writeBuffer, sizeof(writeBuffer));
 
@@ -113,9 +113,12 @@ template <typename T>
 bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray) {
     if (Type == "InsertFW") {
         InsertFW(MainApp, Data);
+        DoPower(MainApp);
+        DoRun(MainApp);
     }else if (Type == "InsertCart") {
         InsertCR(MainApp, Data);
-        DoPower(MainApp);
+    }else if (Type == "RemoveCart") {
+        RemoveCR(MainApp);
     }else if (Type == "DirectionUp" || Type == "DirectionDown" || \
                 Type == "DirectionLeft" || Type == "DirectionRight"){
         PressDirection(MainApp, Cycle, Type);
@@ -193,15 +196,17 @@ void PressCommand(T MainApp) {
 }
 
 template <typename T> std::map<std::string, std::string> OutputRegs(T MainApp, int Cycle){
+    std::cout << "AutoGrader Output Regs" << std::endl;
     return MainApp->OutputRegs(Cycle);
 }
 
 template <typename T> std::map<std::string, std::string> OutputCSRs(T MainApp, int Cycle){
+    std::cout << "AutoGrader Output CSRs" << std::endl;
     return MainApp->OutputCSRs(Cycle);
 }
 
 template <typename T> std::map<std::string, std::string> OutputMem(T MainApp, std::string &Data, int Cycle){
-    std::cout << "here 0" << std::endl;
+    std::cout << "AutoGrader Output Mem" << std::endl;
     // reference from: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
     std::string delim = "-";
 
