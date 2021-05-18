@@ -114,7 +114,7 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rap
     if (Type == "InsertFW") {
         InsertFW(MainApp, Data);
         DoPower(MainApp);
-        DoRun(MainApp);
+        // DoRun(MainApp);
     }else if (Type == "InsertCart") {
         InsertCR(MainApp, Data);
     }else if (Type == "RemoveCart") {
