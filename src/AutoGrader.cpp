@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
             MainApp->LoadInit("CPUFreq", std::to_string(CPUFreq));
         }
     }
-    
+
     MainApp->Run(argc, argv);
     
     // Commands
@@ -107,6 +107,8 @@ int main(int argc, char *argv[]) {
 	rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
 	output.Accept(writer);
 	fclose(f);
+
+    MainApp->DoPowerToggle();
 }
 
 template <typename T> 
