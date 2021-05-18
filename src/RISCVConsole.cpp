@@ -25,7 +25,7 @@ constexpr typename std::underlying_type<E>::type to_underlying(E enumerator) noe
 }
 
 CRISCVConsole::CRISCVConsole(uint32_t timerus, uint32_t videoms, uint32_t cpufreq){
-    DDebugMode = false;
+    DDebugMode = true;
     DTimerDelayUS = timerus;
     DVideoDelayMS = videoms;
     DDebugCPUFreq = cpufreq;
@@ -295,7 +295,8 @@ void CRISCVConsole::Reset(){
 
 void CRISCVConsole::PowerOn(){
     Reset();
-    if(!DDebugMode){
+    std::cout << DDebugMode << std::endl;
+    if(!DDebugMode){    
         SystemRun();
     }
 }
@@ -348,7 +349,7 @@ bool CRISCVConsole::VideoTimerTick(std::shared_ptr<CGraphicSurface> screensurfac
         }
         if(DRefreshScreenBuffer.exchange(false)){
             DVideoController->Refresh(screensurface);
-            DChipset->SetInterruptPending(CRISCVConsoleChipset::EInterruptSource::Video);
+            // DChipset->SetInterruptPending(CRISCVConsoleChipset::EInterruptSource::Video);
             return true;
         }
     }

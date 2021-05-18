@@ -76,11 +76,9 @@ int main(int argc, char *argv[]) {
 
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
                     int CurrentCycle = CMD["Cycle"].GetInt();
-                    if (CurrentCycle != Cycle) {
-                        for (int i = 0; i < (CurrentCycle - Cycle); i++){
-                            MainApp->DoStep();
-                        }
-                        Cycle = CurrentCycle;
+                    while (Cycle < CurrentCycle) {
+                        MainApp->DoStep();
+                        Cycle ++;
                     }
                 }
 

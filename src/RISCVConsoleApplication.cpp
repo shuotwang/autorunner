@@ -1170,6 +1170,7 @@ bool CRISCVConsoleApplication::TempTest() {
 
 int CRISCVConsoleApplication::Run(int argc, char *argv[]){
     ParseArguments(argc,argv);
+    // DDebugMode = true;
     // return DApplication->Run(argc, argv);
     return 0;
 }
