@@ -11,17 +11,17 @@
       "Data":"/code/autograder/files/firmware"
     },
     {
-      "Cycle":2000,
+      "Cycle":3000,
       "Type":"OutputMem",
       "Data":"0x500FE800-0x500FF011"
     },
     {
-      "Cycle":2000,
+      "Cycle":3000,
       "Type":"InsertCart",
       "Data":"/code/autograder/files/cartridge"
     },
     {
-      "Cycle":5000,
+      "Cycle":7000,
       "Type":"OutputMem",
       "Data":"0x500FF414-0x500FF417"
     }

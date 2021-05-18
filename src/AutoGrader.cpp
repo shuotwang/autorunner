@@ -19,7 +19,6 @@
 int main(int argc, char *argv[]) {
 
     auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
-    MainApp->Run(argc, argv);
 
     // Input
     FILE* fp = fopen("/code/autograder/files/input.json", "r");
@@ -58,8 +57,9 @@ int main(int argc, char *argv[]) {
             MainApp->LoadInit("VideoMS", std::to_string(VideoMS));
             MainApp->LoadInit("CPUFreq", std::to_string(CPUFreq));
         }
-
     }
+    
+    MainApp->Run(argc, argv);
     
     // Commands
     if (d.HasMember("Commands")) {

@@ -1109,8 +1109,6 @@ std::string CRISCVConsoleApplication::OutputMem(uint32_t addr, uint32_t bytes, i
         Stream<<std::setfill('0') << std::setw(2) << std::hex << uint32_t(buffer[Index]);
     }
 
-    // std::cout << Stream.str() << std::endl;
-
     return Stream.str();
 }
 
