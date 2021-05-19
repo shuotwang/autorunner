@@ -25,7 +25,7 @@ constexpr typename std::underlying_type<E>::type to_underlying(E enumerator) noe
 }
 
 CRISCVConsole::CRISCVConsole(uint32_t timerus, uint32_t videoms, uint32_t cpufreq){
-    DDebugMode = true;
+    DDebugMode = false;
     DTimerDelayUS = timerus;
     DVideoDelayMS = videoms;
     DDebugCPUFreq = cpufreq;
@@ -295,7 +295,6 @@ void CRISCVConsole::Reset(){
 
 void CRISCVConsole::PowerOn(){
     Reset();
-    std::cout << DDebugMode << std::endl;
     if(!DDebugMode){    
         SystemRun();
     }

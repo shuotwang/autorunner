@@ -1169,8 +1169,9 @@ bool CRISCVConsoleApplication::TempTest() {
 }
 
 int CRISCVConsoleApplication::Run(int argc, char *argv[]){
-    ParseArguments(argc,argv);
-    // DDebugMode = true;
+    // ParseArguments(argc,argv);
+    DDebugMode = true;
+    DRISCVConsole->SetDebugMode(true);
     // return DApplication->Run(argc, argv);
     return 0;
 }
