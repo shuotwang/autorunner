@@ -12,6 +12,55 @@
 #include <cstdlib>
 #include <map>
 
+class AutoGrader {
+    protected:
+        std::string InputJSONPath;
+        std::string OutputJSONPath;
+
+        rapidjson::Document InputJSONDocument; 
+        rapidjson::Document OutputJSONDocument;
+        rapidjson::Value OutputJSONObjectArray;
+        rapidjson::Document::AllocatorType &OutputAllocator;
+
+        std::shared_ptr<CRISCVConsole> DRISCVConsole;
+
+        rapidjson::Document GetInputJSONDocument(std::string &InputJSONPath);
+
+        void ParseInitData();
+        void ParseCommandData();
+        void SendCommand(uint32_t Cycle, std::string &Type, std::string &Data);
+        
+
+        void OutputJSONFile();
+
+        
+    public:
+        explicit AutoGrader(std::string &InputJSONPath, std::string &OutputJSONPath);
+
+        void InsertFW(std::string &Data);
+        void InsertCR(std::string &Data);
+        void RemoveCR();
+
+        void PressDirection(std::string &Data);
+        void ReleaseDirection(std::string &Data);
+        void PressButton(std::string &Type);
+        void ReleaseButton(std::string &Data);
+        void CMDBtn(std::string &Data);
+
+        std::map<std::string, std::string> OutputRegs();
+        std::map<std::string, std::string> OutputCSRs();
+        std::map<std::string, std::string> OutputMem(&Data);
+
+        void DoStep();
+        void DoRun();
+        void DoStop();
+        void DoPowerUp();
+        void DoPowerDown();
+
+
+        
+}
+
 
 template <typename T> 
 bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray);

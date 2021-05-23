@@ -15,31 +15,33 @@
 #include <sstream>
 #include <map>
 
+AutoGrader::AutoGrader(std::string &InputJSONPath, std::string &OutputJSONPath) {
+    AutoGrader::InputJSONPath = InputJSONPath;
+    AutoGrader::OutputJSONPath = OutputJSONPath;
 
-int main(int argc, char *argv[]) {
+    InputJSONDocument = GetInputJSONDocument(InputJSONPath);
+    
+    OutputJSONDocument.SetObject();
+    OutputAllocator = OutputJSONDocument.GetAllocator();
+    OutputJSONObjectArray(rapidjson::kArrayType);
+}
 
-    auto MainApp = CRISCVConsoleApplication::Instance("edu.ucdavis.cs.ecs251.riscv-console");
-
-    // Input
-    FILE* fp = fopen("/code/autograder/files/input.json", "r");
+rapidjson::Document AutoGrader::GetInputJSONDocument(std::string &InputJSONPath) {
+    FILE* fp = fopen(InputJSONPath, "r");
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
     rapidjson::Document d;
     d.ParseStream(is);
     fclose(fp);
 
-    // Output
-    rapidjson::Document output;
-    output.SetObject();
-    rapidjson::Document::AllocatorType& allocator = output.GetAllocator();
-    rapidjson::Value valueObjectArray(rapidjson::kArrayType);
+    return d;
+}
 
+void AutoGrader::ParseInitData() {
+    if (InputJSONDocument.HasMember("Init")) {
+        uint32_t TimerUS = 0, VideoMS = 0, CPUFreq = 0;
 
-    // Init
-    if (d.HasMember("Init")) {
-        int TimerUS = 0, VideoMS = 0, CPUFreq = 0;
-
-        const rapidjson::Value& Init = d["Init"];
+        const rapidjson::Value& Init = InputJSONDocument["Init"];
         if (Init["TimerUS"].IsInt()) {
             TimerUS = Init["TimerUS"].GetInt(); 
         }
@@ -53,18 +55,15 @@ int main(int argc, char *argv[]) {
         }
 
         if (TimerUS != 0 && VideoMS != 0 && CPUFreq != 0) {
-            MainApp->LoadInit("TimerUS", std::to_string(TimerUS));
-            MainApp->LoadInit("VideoMS", std::to_string(VideoMS));
-            MainApp->LoadInit("CPUFreq", std::to_string(CPUFreq));
+            CRISCVConsole(TimerUS, VideoMS, CPUFreq);
         }
     }
+}
 
-    MainApp->Run(argc, argv);
-    
-    // Commands
-    if (d.HasMember("Commands")) {
-        int Cycle = 0;
-        const rapidjson::Value& Commands = d["Commands"];
+void AutoGrader::ParseCommandData() {
+    if (InputJSONDocument.HasMember("Commands")) {
+        uint32_t Cycle = 0;
+        const rapidjson::Value& Commands = InputJSONDocument["Commands"];
         if (Commands.IsArray()) {
             size_t len = Commands.Size();
             for (size_t i = 0; i < len; i++) {
@@ -77,8 +76,8 @@ int main(int argc, char *argv[]) {
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
                     int CurrentCycle = CMD["Cycle"].GetInt();
                     while (Cycle < CurrentCycle) {
-                        MainApp->DoStep();
-                        Cycle ++;
+                        CRISCVConsole->DoStep();
+                        Cycle++;
                     }
                 }
 
@@ -89,32 +88,48 @@ int main(int argc, char *argv[]) {
                 if (CMD.HasMember("Data") && CMD["Data"].IsString()) {
                     Data = CMD["Data"].GetString();
                     Data = Data == "" ? "." : Data;
-                    // TODO: get detailed data for OutputMem
                 }
 
-                SendCommand(Cycle, Type, Data, MainApp, allocator, valueObjectArray);                    
+                SendCommand(Cycle, Type, Data);                    
             }
         }
     }
+}
 
-    output.AddMember("Outputs", valueObjectArray, allocator);
-    FILE* f = fopen("/code/autograder/files/output.json", "w");
+
+void AutoGrader::Run() {
+    
+    // AutoGrader::InputJSONPath = "/code/autograder/files/input.json";
+    // AutoGrader::OutputJSONPath = "/code/autograder/files/output.json";
+
+    
+}
+
+void AutoGrader::OutputJSONFile() {
+    output.AddMember("Outputs", OutputJSONObjectArray, OutputAllocator);
+    FILE* f = fopen(OutputJSONPath, "w");
 	char writeBuffer[65535];
 	rapidjson::FileWriteStream os(f, writeBuffer, sizeof(writeBuffer));
 
 	rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
 	output.Accept(writer);
 	fclose(f);
+}
 
-    MainApp->DoPowerToggle();
+
+int main(int argc, char *argv[]) {
+    
+
+
+
+    
 }
 
 template <typename T> 
-bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray) {
+void SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray) {
     if (Type == "InsertFW") {
         InsertFW(MainApp, Data);
         DoPower(MainApp);
-        // DoRun(MainApp);
     }else if (Type == "InsertCart") {
         InsertCR(MainApp, Data);
     }else if (Type == "RemoveCart") {
@@ -148,7 +163,6 @@ bool SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rap
         temp.AddMember("Mem", outMemJsonVal, Allocator);
         valueObjectArray.PushBack(temp, Allocator);
     }
-    return true;
 }
 
 
