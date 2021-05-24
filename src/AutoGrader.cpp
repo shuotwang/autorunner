@@ -8,6 +8,11 @@
 #include "rapidjson/filewritestream.h"
 #include "RISCVConsoleApplication.h"
 #include "AutoGrader.h"
+#include "RISCVConsole.h"
+#include "FileDataSink.h"
+#include "FileDataSource.h"
+#include "Path.h"
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <cstdio>
@@ -15,18 +20,84 @@
 #include <sstream>
 #include <map>
 
-AutoGrader::AutoGrader(std::string &InputJSONPath, std::string &OutputJSONPath) {
+std::unordered_map<uint32_t, std::string> AutoGrader::CSRMap = 
+{   // Machine Information Registers
+    {0xF11,"mvendorid"},
+    {0xF12,"marchid"},
+    {0xF13,"mimpid"},
+    {0xF14,"mhartid"},
+    //Machine Trap Setup
+    {0x300,"mstatus"},
+    {0x301,"misa"},
+    {0x302,"medeleg"},
+    {0x303,"mideleg"},
+    {0x304,"mie"},
+    {0x305,"mtvec"},
+    {0x306,"mcounteren"},
+    // Machine Trap Handling
+    {0x340,"mscratch"},
+    {0x341,"mepc"},
+    {0x342,"mcause"},
+    {0x343,"mtval"},
+    {0x344,"mip"},
+    // Machine Memory Protection
+    {0x3A0,"pmpcfg0"}, {0x3A1,"pmpcfg1"}, {0x3A2,"pmpcfg2"}, {0x3A3,"pmpcfg3"},
+    {0x3B0,"pmpaddr0"}, {0x3B1,"pmpaddr1"}, {0x3B2,"pmpaddr2"}, {0x3B3,"pmpaddr3"},
+    {0x3B4,"pmpaddr4"}, {0x3B5,"pmpaddr5"}, {0x3B6,"pmpaddr6"}, {0x3B7,"pmpaddr7"},
+    {0x3B8,"pmpaddr8"}, {0x3B9,"pmpaddr9"}, {0x3BA,"pmpaddr10"}, {0x3BB,"pmpaddr11"},
+    {0x3BC,"pmpaddr12"}, {0x3BD,"pmpaddr13"}, {0x3BE,"pmpaddr14"}, {0x3BF,"pmpaddr15"},
+    // Machine Counter/Timers
+    {0xB00,"mcycle"},
+    {0xB02,"minstret"},
+    {0xB03,"mhpmcounter3"},
+    {0xB04,"mhpmcounter4"},  {0xB05,"mhpmcounter5"},  {0xB06,"mhpmcounter6"},  {0xB07,"mhpmcounter7"},
+    {0xB08,"mhpmcounter8"},  {0xB09,"mhpmcounter9"},  {0xB0A,"mhpmcounter10"}, {0xB0B,"mhpmcounter11"},
+    {0xB0C,"mhpmcounter12"}, {0xB0D,"mhpmcounter13"}, {0xB0E,"mhpmcounter14"}, {0xB0F,"mhpmcounter15"},
+    {0xB10,"mhpmcounter16"}, {0xB11,"mhpmcounter17"}, {0xB12,"mhpmcounter18"}, {0xB13,"mhpmcounter19"},
+    {0xB14,"mhpmcounter20"}, {0xB15,"mhpmcounter21"}, {0xB16,"mhpmcounter22"}, {0xB17,"mhpmcounter23"},
+    {0xB18,"mhpmcounter24"}, {0xB19,"mhpmcounter25"}, {0xB1A,"mhpmcounter26"}, {0xB1B,"mhpmcounter27"},
+    {0xB1C,"mhpmcounter28"}, {0xB1D,"mhpmcounter29"}, {0xB1E,"mhpmcounter30"}, {0xB1F,"mhpmcounter31"},
+    {0xB80,"mcycleh"},
+    {0xB82,"minstreth"},
+    {0xB83,"mhpmcounter3h"},
+    {0xB84,"mhpmcounter4h"},  {0xB85,"mhpmcounter5h"},  {0xB86,"mhpmcounter6h"},  {0xB87,"mhpmcounter7h"},
+    {0xB88,"mhpmcounter8h"},  {0xB89,"mhpmcounter9h"},  {0xB8A,"mhpmcounter10h"}, {0xB8B,"mhpmcounter11h"},
+    {0xB8C,"mhpmcounter12h"}, {0xB8D,"mhpmcounter13h"}, {0xB8E,"mhpmcounter14h"}, {0xB8F,"mhpmcounter15h"},
+    {0xB90,"mhpmcounter16h"}, {0xB91,"mhpmcounter17h"}, {0xB92,"mhpmcounter18h"}, {0xB93,"mhpmcounter19h"},
+    {0xB94,"mhpmcounter20h"}, {0xB95,"mhpmcounter21h"}, {0xB96,"mhpmcounter22h"}, {0xB97,"mhpmcounter23h"},
+    {0xB98,"mhpmcounter24h"}, {0xB99,"mhpmcounter25h"}, {0xB9A,"mhpmcounter26h"}, {0xB9B,"mhpmcounter27h"},
+    {0xB9C,"mhpmcounter28h"}, {0xB9D,"mhpmcounter29h"}, {0xB9E,"mhpmcounter30h"}, {0xB9F,"mhpmcounter31h"},
+    // Machine Counter Setup
+    {0x320,"mcountinhibit"},
+    {0x323,"mhpmevent3"},
+    {0x324,"mhpmevent4"},  {0x325,"mhpmevent5"},  {0x326,"mhpmevent6"},  {0x327,"mhpmevent7"},
+    {0x328,"mhpmevent8"},  {0x329,"mhpmevent9"},  {0x32A,"mhpmevent10"}, {0x32B,"mhpmevent11"},
+    {0x32C,"mhpmevent12"}, {0x32D,"mhpmevent13"}, {0x32E,"mhpmevent14"}, {0x32F,"mhpmevent15"},
+    {0x330,"mhpmevent16"}, {0x331,"mhpmevent17"}, {0x332,"mhpmevent18"}, {0x333,"mhpmevent19"},
+    {0x334,"mhpmevent20"}, {0x335,"mhpmevent21"}, {0x336,"mhpmevent22"}, {0x337,"mhpmevent23"},
+    {0x338,"mhpmevent24"}, {0x339,"mhpmevent25"}, {0x33A,"mhpmevent26"}, {0x33B,"mhpmevent27"},
+    {0x33C,"mhpmevent28"}, {0x33D,"mhpmevent29"}, {0x33E,"mhpmevent30"}, {0x33F,"mhpmevent31"},
+
+};
+
+AutoGrader::AutoGrader(char *InputJSONPath, char *OutputJSONPath){
     AutoGrader::InputJSONPath = InputJSONPath;
     AutoGrader::OutputJSONPath = OutputJSONPath;
 
     InputJSONDocument = GetInputJSONDocument(InputJSONPath);
-    
+    ParseInitData();
+
     OutputJSONDocument.SetObject();
-    OutputAllocator = OutputJSONDocument.GetAllocator();
-    OutputJSONObjectArray(rapidjson::kArrayType);
+
+    rapidjson::Value TempValue(rapidjson::kArrayType);
+    OutputJSONObjectArray = TempValue;
+
+    // Run
+    ParseCommandData();
+    OutputJSONFile();
 }
 
-rapidjson::Document AutoGrader::GetInputJSONDocument(std::string &InputJSONPath) {
+rapidjson::Document AutoGrader::GetInputJSONDocument(char *InputJSONPath) {
     FILE* fp = fopen(InputJSONPath, "r");
     char readBuffer[65536];
     rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
@@ -38,9 +109,9 @@ rapidjson::Document AutoGrader::GetInputJSONDocument(std::string &InputJSONPath)
 }
 
 void AutoGrader::ParseInitData() {
-    if (InputJSONDocument.HasMember("Init")) {
-        uint32_t TimerUS = 0, VideoMS = 0, CPUFreq = 0;
+    uint32_t TimerUS = 0, VideoMS = 0, CPUFreq = 0;
 
+    if (InputJSONDocument.HasMember("Init")) {
         const rapidjson::Value& Init = InputJSONDocument["Init"];
         if (Init["TimerUS"].IsInt()) {
             TimerUS = Init["TimerUS"].GetInt(); 
@@ -53,11 +124,8 @@ void AutoGrader::ParseInitData() {
         if (Init["CPUFreq"].IsInt()) {
             CPUFreq = Init["CPUFreq"].GetInt();
         }
-
-        if (TimerUS != 0 && VideoMS != 0 && CPUFreq != 0) {
-            CRISCVConsole(TimerUS, VideoMS, CPUFreq);
-        }
     }
+    DRISCVConsole = std::make_shared<CRISCVConsole>(TimerUS, VideoMS, CPUFreq);
 }
 
 void AutoGrader::ParseCommandData() {
@@ -76,7 +144,7 @@ void AutoGrader::ParseCommandData() {
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
                     int CurrentCycle = CMD["Cycle"].GetInt();
                     while (Cycle < CurrentCycle) {
-                        CRISCVConsole->DoStep();
+                        DoStep();
                         Cycle++;
                     }
                 }
@@ -95,132 +163,200 @@ void AutoGrader::ParseCommandData() {
         }
     }
 }
-
-
-void AutoGrader::Run() {
     
-    // AutoGrader::InputJSONPath = "/code/autograder/files/input.json";
-    // AutoGrader::OutputJSONPath = "/code/autograder/files/output.json";
 
-    
-}
+
 
 void AutoGrader::OutputJSONFile() {
-    output.AddMember("Outputs", OutputJSONObjectArray, OutputAllocator);
+    rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
+    OutputJSONDocument.AddMember("Outputs", OutputJSONObjectArray, OutputAllocator);
     FILE* f = fopen(OutputJSONPath, "w");
 	char writeBuffer[65535];
 	rapidjson::FileWriteStream os(f, writeBuffer, sizeof(writeBuffer));
 
 	rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
-	output.Accept(writer);
+	OutputJSONDocument.Accept(writer);
 	fclose(f);
 }
 
-
-int main(int argc, char *argv[]) {
-    
-
-
-
-    
-}
-
-template <typename T> 
-void SendCommand(int Cycle, std::string &Type, std::string &Data, T MainApp, rapidjson::Document::AllocatorType &Allocator, rapidjson::Value &valueObjectArray) {
+void AutoGrader::SendCommand(uint32_t Cycle, std::string &Type, std::string &Data) {
     if (Type == "InsertFW") {
-        InsertFW(MainApp, Data);
-        DoPower(MainApp);
+        InsertFW(Data);
+        DoPowerOn();
     }else if (Type == "InsertCart") {
-        InsertCR(MainApp, Data);
+        InsertCR(Data);
     }else if (Type == "RemoveCart") {
-        RemoveCR(MainApp);
+        RemoveCR();
     }else if (Type == "DirectionUp" || Type == "DirectionDown" || \
                 Type == "DirectionLeft" || Type == "DirectionRight"){
-        PressDirection(MainApp, Cycle, Type);
+        PressDirection(Type);
     }else if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn") {
-        PressButton(MainApp, Cycle, Type);
+        PressButton(Type);
     }else if (Type == "CMDBtn") {
-        PressCommand(MainApp);
+        PressCommand();
     }else if (Type == "OutputRegs") {
-        std::map<std::string, std::string> outRegs = OutputRegs(MainApp, Cycle);
-        rapidjson::Value outRegJsonVal = FormatOutputMap(outRegs, Allocator);
+        std::map<std::string, std::string> outRegs = OutputRegs();
+        rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
+        rapidjson::Value outRegJsonVal = FormatOutputMap(outRegs, OutputAllocator);
         rapidjson::Value temp(rapidjson::kObjectType);
-        temp.AddMember("Cycle", Cycle, Allocator);
-        temp.AddMember("Regs", outRegJsonVal, Allocator);
-        valueObjectArray.PushBack(temp, Allocator);
+        temp.AddMember("Cycle", Cycle, OutputAllocator);
+        temp.AddMember("Regs", outRegJsonVal, OutputAllocator);
+        OutputJSONObjectArray.PushBack(temp, OutputAllocator);
     }else if (Type == "OutputCSRs") {
-        std::map<std::string, std::string> outCSRs = OutputCSRs(MainApp, Cycle);
-        rapidjson::Value outCSRJsonVal = FormatOutputMap(outCSRs, Allocator);
+        std::map<std::string, std::string> outCSRs = OutputCSRs();
+        rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
+        rapidjson::Value outCSRJsonVal = FormatOutputMap(outCSRs, OutputAllocator);
         rapidjson::Value temp(rapidjson::kObjectType);
-        temp.AddMember("Cycle", Cycle, Allocator);
-        temp.AddMember("CSRs", outCSRJsonVal, Allocator);
-        valueObjectArray.PushBack(temp, Allocator);
+        temp.AddMember("Cycle", Cycle, OutputAllocator);
+        temp.AddMember("CSRs", outCSRJsonVal, OutputAllocator);
+        OutputJSONObjectArray.PushBack(temp, OutputAllocator);
     }else if (Type == "OutputMem") {
-        std::map<std::string, std::string> outMem = OutputMem(MainApp, Data, Cycle);
-        rapidjson::Value outMemJsonVal = FormatOutputMap(outMem, Allocator);
+        std::map<std::string, std::string> outMem = OutputMem(Data);
+        rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
+        rapidjson::Value outMemJsonVal = FormatOutputMap(outMem, OutputAllocator);
         rapidjson::Value temp(rapidjson::kObjectType);
-        temp.AddMember("Cycle", Cycle, Allocator);
-        temp.AddMember("Mem", outMemJsonVal, Allocator);
-        valueObjectArray.PushBack(temp, Allocator);
+        temp.AddMember("Cycle", Cycle, OutputAllocator);
+        temp.AddMember("Mem", outMemJsonVal, OutputAllocator);
+        OutputJSONObjectArray.PushBack(temp, OutputAllocator);
     }
 }
 
 
-template <typename T> 
-void InsertFW(T MainApp, std::string &Data){
-    if (!MainApp->LoadFW(Data)) {
-        std::cout << "Invalid FW Path" << std::endl;
+bool AutoGrader::InsertFW(std::string &Data){
+    if (!Data.empty()){
+        std::string FWFileName = Data;
+
+        auto InFile = std::make_shared<CFileDataSource>(FWFileName);
+        if(DRISCVConsole->ProgramFirmware(InFile)){
+            std::cout << "FW Loaded" << std::endl;
+            return true;
+        }
     }
+    return false;
 }
 
-template <typename T>
-void InsertCR(T MainApp, std::string &Data){
-    if (!MainApp->LoadCR(Data)) {
-        std::cout << "Invalid CR Path" << std::endl;
+bool AutoGrader::InsertCR(std::string &Data){
+    if (!Data.empty()){
+        std::string CRFileName = Data;
+
+        auto InFile = std::make_shared<CFileDataSource>(CRFileName);
+        if(DRISCVConsole->InsertCartridge(InFile)){
+            std::cout << "CR Loaded" << std::endl;
+            return true;
+        }
     }
+    return false;
 }
 
-template <typename T> void RemoveCR(T MainApp) {
-    MainApp->RemoveCR();
+bool AutoGrader::RemoveCR() {
+    DRISCVConsole->RemoveCartridge();
+    return true;
 }
 
-template <typename T> 
-void PressDirection(T MainApp, int Cycle, std::string &Data){
-    MainApp->PressDirection(Data);
+bool AutoGrader::PressDirection(std::string &Data){
+    if (!Data.empty()) {
+        if (Data == "DirectionUp") {
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Up);
+            return true;
+        } else if (Data == "DirectionDown") {
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Down);
+            return true;
+        } else if (Data == "DirectionLeft") {
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Left);
+            return true;
+        } else if (Data == "DirectionRight") {
+            DRISCVConsole->PressDirection(CRISCVConsole::EDirection::Right);
+            return true;
+        }
+    }
+    return false;
 }
 
-template <typename T> 
-void ReleaseDirection(T MainApp, std::string &Data) {
-    MainApp->ReleaseDirection(Data);
+bool AutoGrader::ReleaseDirection(std::string &Data) {
+    if (!Data.empty()) {
+        if (Data == "DirectionUp") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Up);
+            return true;
+        } else if (Data == "DirectionDown") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Down);
+            return true;
+        } else if (Data == "DirectionLeft") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Left);
+            return true;
+        } else if (Data == "DirectionRight") {
+            DRISCVConsole->ReleaseDirection(CRISCVConsole::EDirection::Right);
+            return true;
+        }
+    }
+    return false;
 }
 
-template <typename T> 
-void PressButton(T MainApp, int Cycle, std::string &Data) {
-    MainApp->PressNumber(Data);
+bool AutoGrader::PressButton(std::string &Data) {
+    if (!Data.empty()) {
+        if (Data == "UBtn") {
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button1);
+            return true;
+        }else if (Data == "IBtn") {
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button2);
+            return true;
+        }else if (Data == "JBtn") {
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button3);
+            return true;
+        }else if (Data == "KBtn") {
+            DRISCVConsole->PressButton(CRISCVConsole::EButtonNumber::Button4);
+            return true;
+        }
+    }
+    return false;
 }
 
-template <typename T>
-void ReleaseButton(T MainApp, std::string &Data) {
-    MainApp->ReleaseNumber(Data);
+bool AutoGrader::ReleaseButton(std::string &Data) {
+    if (!Data.empty()) {
+        if (Data == "UBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button1);
+            return true;
+        }else if (Data == "IBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button2);
+            return true;
+        }else if (Data == "JBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button3);
+            return true;
+        }else if (Data == "KBtn") {
+            DRISCVConsole->ReleaseButton(CRISCVConsole::EButtonNumber::Button4);
+            return true;
+        }
+    }
+    return false;
 }
 
-template <typename T> 
-void PressCommand(T MainApp) {
-    MainApp->PressCommand();
+bool AutoGrader::PressCommand() {
+    DRISCVConsole->PressCommand();
+    return true;
 }
 
-template <typename T> std::map<std::string, std::string> OutputRegs(T MainApp, int Cycle){
-    std::cout << "AutoGrader Output Regs" << std::endl;
-    return MainApp->OutputRegs(Cycle);
+std::map<std::string, std::string> AutoGrader::OutputRegs(){
+    std::map<std::string, std::string> RegOutputMap;
+
+    for(size_t Index = 0; Index < CRISCVCPU::RegisterCount(); Index++){
+        auto RegisterName = CRISCVCPU::CInstruction::RegisterName(Index);
+        RegOutputMap[RegisterName] = FormatHex32Bit(DRISCVConsole->CPU()->Register(Index));
+    }
+
+    return RegOutputMap;
 }
 
-template <typename T> std::map<std::string, std::string> OutputCSRs(T MainApp, int Cycle){
-    std::cout << "AutoGrader Output CSRs" << std::endl;
-    return MainApp->OutputCSRs(Cycle);
+std::map<std::string, std::string> AutoGrader::OutputCSRs(){
+    std::map<std::string, std::string> CSROutputMap;
+    size_t LineIndex = 0;
+    for(uint32_t CSRAddr : DRISCVConsole->CPU()->ControlStatusRegisterKeys()){
+        std::string CSRName = CSRMap.find(CSRAddr)->second;
+        CSROutputMap[CSRName] = FormatHex32Bit(DRISCVConsole->CPU()->ControlStatusRegister(CSRAddr));
+        LineIndex++;
+    }
+    return CSROutputMap;
 }
 
-template <typename T> std::map<std::string, std::string> OutputMem(T MainApp, std::string &Data, int Cycle){
-    std::cout << "AutoGrader Output Mem" << std::endl;
+std::map<std::string, std::string> AutoGrader::OutputMem(std::string &Data){
     // reference from: https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
     std::string delim = "-";
 
@@ -240,35 +376,42 @@ template <typename T> std::map<std::string, std::string> OutputMem(T MainApp, st
 
     uint32_t startAddHex = GetAddHex(startAdd);
     uint32_t bytes = GetAddHex(endAdd) - startAddHex + 1;
-    return {{startAdd, MainApp->OutputMem(startAddHex, bytes, Cycle)}};
 
-    
-}
+    std::stringstream OutputStream;
+    const uint8_t *buffer = DRISCVConsole->Memory()->LoadData(startAddHex, bytes);
 
-template <typename T> void DoStep(T MainApp) {
-    MainApp->DoStep();
-}
-
-template <typename T> void DoRun(T MainApp) {
-    if(!MainApp->DoRun()) {
-        std::cout << "Run Not Working" << std::endl;
+    for(uint32_t Index = 0; Index < bytes; Index++){
+        OutputStream<<std::setfill('0') << std::setw(2) << std::hex << uint32_t(buffer[Index]);
     }
+    return {{startAdd, OutputStream.str()}};
 }
 
-template <typename T> void DoRunToggle(T MainApp) {
-    MainApp->DoRunToggle();
+bool AutoGrader::DoStep() {
+    DRISCVConsole->Step();
+    return true;
 }
 
-template <typename T> void DoPower(T MainApp) {
-    MainApp->DoPower();
+bool AutoGrader::DoRun() {
+    DRISCVConsole->Run();
+    return true;
 }
 
-template <typename T> void DoPowerToggle(T MainApp) {
-    MainApp->DoPowerToggle();
+bool AutoGrader::DoStop() {
+    DRISCVConsole->Stop();
+    return true;
 }
 
-uint32_t GetAddHex(std::string strAdd){
+bool AutoGrader::DoPowerOn() {
+    DRISCVConsole->PowerOn();
+    return true;
+}
 
+bool AutoGrader::DoPowerOff() {
+    DRISCVConsole->PowerOff();
+    return true;
+}
+
+uint32_t AutoGrader::GetAddHex(std::string strAdd){
     // reference from: https://stackoverflow.com/questions/1070497/c-convert-hex-string-to-signed-integer
     unsigned int x;   
     std::stringstream ss;
@@ -279,9 +422,8 @@ uint32_t GetAddHex(std::string strAdd){
     return addr;
 }
 
-rapidjson::Value FormatOutputMap(std::map<std::string, std::string> Map, rapidjson::Document::AllocatorType &Allocator){
+rapidjson::Value AutoGrader::FormatOutputMap(std::map<std::string, std::string> Map, rapidjson::Document::AllocatorType &Allocator){
     rapidjson::Value root(rapidjson::kObjectType);
-
     rapidjson::Value key(rapidjson::kStringType);  
     rapidjson::Value value(rapidjson::kStringType); 
  
@@ -292,4 +434,10 @@ rapidjson::Value FormatOutputMap(std::map<std::string, std::string> Map, rapidjs
 	}
 
     return root;
+}
+
+std::string AutoGrader::FormatHex32Bit(uint32_t val){
+    std::stringstream Stream;
+    Stream<<std::setfill('0') << std::setw(8) << std::hex << val;
+    return Stream.str();
 }

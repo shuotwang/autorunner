@@ -49,6 +49,7 @@ APP_OBJS = $(OBJ_DIR)/AutoGrader.o                    \
     $(OBJ_DIR)/Path.o                           \
     $(OBJ_DIR)/MemoryControllerDevice.o         \
     $(OBJ_DIR)/MemoryDevice.o                   \
+    $(OBJ_DIR)/main.o                   \
     $(OBJ_DIR)/FlashMemoryDevice.o              \
     $(OBJ_DIR)/RAMMemoryDevice.o                \
     $(OBJ_DIR)/RegisterBlockMemoryDevice.o      \
