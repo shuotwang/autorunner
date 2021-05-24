@@ -126,27 +126,24 @@ void AutoGrader::ParseInitData() {
         }
     }
     DRISCVConsole = std::make_shared<CRISCVConsole>(TimerUS, VideoMS, CPUFreq);
+    DRISCVConsole->SetDebugMode(true);
 }
 
 void AutoGrader::ParseCommandData() {
     if (InputJSONDocument.HasMember("Commands")) {
-        uint32_t Cycle = 0;
         const rapidjson::Value& Commands = InputJSONDocument["Commands"];
         if (Commands.IsArray()) {
             size_t len = Commands.Size();
             for (size_t i = 0; i < len; i++) {
-
+                uint32_t CurrentCycle = 0;
+                uint32_t NextCycle = 0;
                 std::string Type = "";
                 std::string Data = "";
 
                 const rapidjson::Value& CMD = Commands[i];
 
                 if (CMD.HasMember("Cycle") && CMD["Cycle"].IsInt()) {
-                    int CurrentCycle = CMD["Cycle"].GetInt();
-                    while (Cycle < CurrentCycle) {
-                        DoStep();
-                        Cycle++;
-                    }
+                    CurrentCycle = CMD["Cycle"].GetInt();
                 }
 
                 if (CMD.HasMember("Type") && CMD["Type"].IsString()) {
@@ -157,11 +154,34 @@ void AutoGrader::ParseCommandData() {
                     Data = CMD["Data"].GetString();
                     Data = Data == "" ? "." : Data;
                 }
-
-                SendCommand(Cycle, Type, Data);                    
+                
+                if (i + 1 < len) {
+                    const rapidjson::Value &NextCMD = Commands[i+1];
+                    if (NextCMD.HasMember("Cycle") && NextCMD["Cycle"].IsInt()) {
+                        NextCycle = NextCMD["Cycle"].GetInt();
+                    }
+                }else {
+                    NextCycle = CurrentCycle;
+                }
+                SendCommand(CurrentCycle, NextCycle, Type, Data);                    
             }
         }
     }
+}
+
+bool AutoGrader::IsDirectionButton(std::string &Type) {
+    if (Type == "DirectionUp" || Type == "DirectionDown" || \
+        Type == "DirectionLeft" || Type == "DirectionRight") {
+            return true;
+        }
+    return false;
+}
+
+bool AutoGrader::IsNumberButton(std::string &Type) {
+    if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn"){
+        return true;
+    }
+    return false;
 }
     
 
@@ -179,21 +199,33 @@ void AutoGrader::OutputJSONFile() {
 	fclose(f);
 }
 
-void AutoGrader::SendCommand(uint32_t Cycle, std::string &Type, std::string &Data) {
+void AutoGrader::SendCommand(uint32_t Cycle, uint32_t NextCycle, std::string &Type, std::string &Data) {
     if (Type == "InsertFW") {
         InsertFW(Data);
         DoPowerOn();
+        DoCycleSteps(Cycle, NextCycle);
     }else if (Type == "InsertCart") {
         InsertCR(Data);
+        DoCycleSteps(Cycle, NextCycle);
     }else if (Type == "RemoveCart") {
         RemoveCR();
-    }else if (Type == "DirectionUp" || Type == "DirectionDown" || \
-                Type == "DirectionLeft" || Type == "DirectionRight"){
-        PressDirection(Type);
-    }else if (Type == "UBtn" || Type == "IBtn" || Type == "JBtn" || Type == "KBtn") {
-        PressButton(Type);
+        DoCycleSteps(Cycle, NextCycle);
+    }else if (IsDirectionButton(Type) || IsNumberButton(Type)) {
+        for (uint32_t i=0; i<(NextCycle - Cycle); i++) {
+            if (IsDirectionButton(Type)){
+                PressDirection(Type);
+            }
+
+            if (IsNumberButton(Type)){
+                PressDirection(Type);
+            }
+            DoStep();
+        }
+        ReleaseDirection(Type);
+        ReleaseButton(Type);
     }else if (Type == "CMDBtn") {
         PressCommand();
+        DoCycleSteps(Cycle, NextCycle);
     }else if (Type == "OutputRegs") {
         std::map<std::string, std::string> outRegs = OutputRegs();
         rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
@@ -202,6 +234,7 @@ void AutoGrader::SendCommand(uint32_t Cycle, std::string &Type, std::string &Dat
         temp.AddMember("Cycle", Cycle, OutputAllocator);
         temp.AddMember("Regs", outRegJsonVal, OutputAllocator);
         OutputJSONObjectArray.PushBack(temp, OutputAllocator);
+        DoCycleSteps(Cycle, NextCycle);
     }else if (Type == "OutputCSRs") {
         std::map<std::string, std::string> outCSRs = OutputCSRs();
         rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
@@ -210,6 +243,7 @@ void AutoGrader::SendCommand(uint32_t Cycle, std::string &Type, std::string &Dat
         temp.AddMember("Cycle", Cycle, OutputAllocator);
         temp.AddMember("CSRs", outCSRJsonVal, OutputAllocator);
         OutputJSONObjectArray.PushBack(temp, OutputAllocator);
+        DoCycleSteps(Cycle, NextCycle);
     }else if (Type == "OutputMem") {
         std::map<std::string, std::string> outMem = OutputMem(Data);
         rapidjson::Document::AllocatorType &OutputAllocator = OutputJSONDocument.GetAllocator();
@@ -218,6 +252,7 @@ void AutoGrader::SendCommand(uint32_t Cycle, std::string &Type, std::string &Dat
         temp.AddMember("Cycle", Cycle, OutputAllocator);
         temp.AddMember("Mem", outMemJsonVal, OutputAllocator);
         OutputJSONObjectArray.PushBack(temp, OutputAllocator);
+        DoCycleSteps(Cycle, NextCycle);
     }
 }
 
@@ -410,6 +445,13 @@ bool AutoGrader::DoPowerOff() {
     DRISCVConsole->PowerOff();
     return true;
 }
+
+bool AutoGrader::DoCycleSteps(uint32_t Cycle, uint32_t NextCycle){
+    for (uint32_t i=0; i < (NextCycle - Cycle); i++) {
+        DoStep();
+    }
+    return true;
+}   
 
 uint32_t AutoGrader::GetAddHex(std::string strAdd){
     // reference from: https://stackoverflow.com/questions/1070497/c-convert-hex-string-to-signed-integer

@@ -31,7 +31,7 @@ class AutoGrader {
 
         void ParseInitData();
         void ParseCommandData();
-        void SendCommand(uint32_t Cycle, std::string &Type, std::string &Data);
+        void SendCommand(uint32_t Cycle, uint32_t NextCycle, std::string &Type, std::string &Data);
 
         void OutputJSONFile();
 
@@ -39,11 +39,14 @@ class AutoGrader {
         bool InsertCR(std::string &Data);
         bool RemoveCR();
 
-        bool PressDirection(std::string &Data);
-        bool ReleaseDirection(std::string &Data);
+        bool PressDirection(std::string &Type);
+        bool ReleaseDirection(std::string &Type);
         bool PressButton(std::string &Type);
-        bool ReleaseButton(std::string &Data);
+        bool ReleaseButton(std::string &Type);
         bool PressCommand();
+        
+        bool IsDirectionButton(std::string &Type);
+        bool IsNumberButton(std::string &Type);
 
         std::map<std::string, std::string> OutputRegs();
         std::map<std::string, std::string> OutputCSRs();
@@ -54,6 +57,7 @@ class AutoGrader {
         bool DoStop();
         bool DoPowerOn();
         bool DoPowerOff();
+        bool DoCycleSteps(uint32_t Cycle, uint32_t NextCycle);
 
         uint32_t GetAddHex(std::string strAdd);
         rapidjson::Value FormatOutputMap(std::map<std::string, std::string> Map, rapidjson::Document::AllocatorType &Allocator);
