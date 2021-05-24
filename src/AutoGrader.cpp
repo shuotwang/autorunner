@@ -263,7 +263,6 @@ bool AutoGrader::InsertFW(std::string &Data){
 
         auto InFile = std::make_shared<CFileDataSource>(FWFileName);
         if(DRISCVConsole->ProgramFirmware(InFile)){
-            std::cout << "FW Loaded" << std::endl;
             return true;
         }
     }
@@ -276,7 +275,6 @@ bool AutoGrader::InsertCR(std::string &Data){
 
         auto InFile = std::make_shared<CFileDataSource>(CRFileName);
         if(DRISCVConsole->InsertCartridge(InFile)){
-            std::cout << "CR Loaded" << std::endl;
             return true;
         }
     }

@@ -21,12 +21,12 @@
       "Data":"/code/autograder/files/cartridge"
     },
     {
-      "Cycle":4000000,
+      "Cycle":3955000,
       "Type":"OutputMem",
       "Data":"0x500FF214-0x500FF217"
     },
     {
-      "Cycle":4000000,
+      "Cycle":3955000,
       "Type":"OutputMem",
       "Data":"0x500FF414-0x500FF417"
     }

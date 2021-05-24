@@ -55,8 +55,6 @@ bool CRISCVConsoleApplicationConfiguration::Load(std::shared_ptr< CDataSource> s
             std::stringstream Stream(Line);
             std::string Key, Value;
 
-            // std::cout << "Config" << Key << " " << Value << std::endl;
-
             Stream>>Key>>Value;
             auto Search = DParameterNames.find(Key);
             if((Search != DParameterNames.end())&&(Value.length())){
