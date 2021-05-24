@@ -1,5 +1,16 @@
 # AutoGrader
 
+## To Start
+1. open terminal and change directory to ```/autograder/```
+2. launch script with command ```./rvconsole.sh```
+3. change directory ```cd autograder```
+4. make file with command ```make```
+5. change directory to ```/bin/``` and run the executive ```./autograder```
+
+* To change Firmware / Cartridge / input.json file, or to obtain output.json file, go to ```/files/```
+
+
+
 ## Input Format
 
 The AutoGrader takes JSON file named ```input.json``` as an input. 
@@ -137,7 +148,7 @@ Here is an example:
 ```
 
 ## Design 
-We have implemented most of operations in the GUI console, including ```w,a,x,d``` directions key events, ```CMD``` key events, ```u,i,j,k``` key events, as well as ```Firmware``` Insert, ```Cartridge``` Insert and remove, ```Run``` and ```PWR``` key events in debug mode. Each button corresponds to one command in ```input.json``` file. 
+We have implemented most of operations in the GUI console, including ```w(up),a(left),x(down),d(right)``` directions key events, ```CMD``` key events, ```u,i,j,k``` key events, as well as ```Firmware``` Insert, ```Cartridge``` Insert and remove, ```Run``` and ```PWR``` key events in debug mode. Each button corresponds to one command in ```input.json``` file. 
 
 The ```memory``` buttons, ```Clear``` button and ```RST``` button were not implemented. 
 
