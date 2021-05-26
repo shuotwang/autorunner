@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <memory>
 
-class AutoGrader {
+class AutoRunner {
     protected:
         char *InputJSONPath;
         char *OutputJSONPath;
@@ -64,7 +64,7 @@ class AutoGrader {
         std::string FormatHex32Bit(uint32_t val);
         
     public:
-        explicit AutoGrader(char *InputJSONPath, char *OutputJSONPath);
+        explicit AutoRunner(char *InputJSONPath, char *OutputJSONPath);
 
 };
 
