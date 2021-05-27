@@ -24,11 +24,6 @@ class CRISCVConsoleApplication : public std::enable_shared_from_this<CRISCVConso
         bool DDebugMode = false;
         bool DFollowingInstruction = false;
 
-        // audograder
-        std::string FWFileName;
-        std::string CRFileName;
-        static std::unordered_map<uint32_t, std::string> CSRMap;
-
         std::shared_ptr<CGUIWindow> DMainWindow;
         std::shared_ptr<CGUIBox> DConsoleDebugBox;
         std::shared_ptr<CGUIBox> DConsoleBox;

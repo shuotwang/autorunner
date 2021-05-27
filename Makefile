@@ -31,7 +31,7 @@ LDFLAGS  +=`pkg-config --libs $(PKGS)`
 #LDFLAGS += -lgdk_imlib
 CPPFLAGS += -std=c++14 
 
-APP_NAME = autograder
+APP_NAME = autorunner
 
 APP_OBJS = $(OBJ_DIR)/AutoRunner.o                    \
 	$(OBJ_DIR)/GraphicFactoryCairo.o            \
