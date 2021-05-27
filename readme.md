@@ -1,19 +1,21 @@
-# AutoGrader
+# AutoRunner
 
 ## To Start
-1. open terminal and change directory to ```/autograder/```
+1. open terminal and change directory to ```/autorunner/```
 2. launch script with command ```./rvconsole.sh```
-3. change directory ```cd autograder```
+3. change directory ```cd autorunner```
 4. make file with command ```make```
-5. change directory to ```/bin/``` and run the executive ```./autograder```
+5. change directory to ```/bin/``` and run the executive ```./autorunner```
 
-* To change Firmware / Cartridge / input.json file, or to obtain output.json file, go to ```/files/```
+* To change **Firmware / Cartridge / input.json** file, or to obtain **output.json** file, go to ```/files/```
+* To change paths of **input.json** and **output.json**, input command arguments: ```./bin/autorunner INPUT_JSON_PATH OUTPUT_JSON_PATH```, both are absolute path.
+* Default **input.json output.json** folder is: ```/code/autorunner/files/```
 
 
 
 ## Input Format
 
-The AutoGrader takes JSON file named ```input.json``` as an input. 
+The AutoRunner takes JSON file named ```input.json``` as an input. 
 The ```input.json``` file has 2 parts: Init and Commands
 
 Please go to ```file``` folder, find input.json and modify.
@@ -56,12 +58,12 @@ The JSON file format is shown as follows:
     {
       "Cycle":0,
       "Type":"InsertFW",
-      "Data":"/code/autograder/files/firmware"
+      "Data":"/code/autorunner/files/firmware"
     },
     {
       "Cycle":0,
       "Type":"InsertCart",
-      "Data":"/code/autograder/files/cartridge"
+      "Data":"/code/autorunner/files/cartridge"
     },
     {
       "Cycle":1000,
