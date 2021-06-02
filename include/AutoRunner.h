@@ -32,6 +32,16 @@ class CAutoRunner {
         static const std::string DIRECTION_LEFT_STRING;
         static const std::string DIRECTION_RIGHT_STRING;
 
+        static const std::string DIRECTION_UP_RELEASE_STRING;
+        static const std::string DIRECTION_DOWN_RELEASE_STRING;
+        static const std::string DIRECTION_LEFT_RELEASE_STRING;
+        static const std::string DIRECTION_RIGHT_RELEASE_STRING;
+
+        static const std::string U_BUTTON_RELEASE_STRING;
+        static const std::string I_BUTTON_RELEASE_STRING;
+        static const std::string J_BUTTON_RELEASE_STRING;
+        static const std::string K_BUTTON_RELEASE_STRING;
+
         static const std::string U_BUTTON_STRING;
         static const std::string I_BUTTON_STRING;
         static const std::string J_BUTTON_STRING;
@@ -79,6 +89,9 @@ class CAutoRunner {
         
         bool IsDirectionButton(std::string &type);
         bool IsNumberButton(std::string &type);
+
+        bool IsDirectionReleaseButton(std::string &type);
+        bool IsNumberReleaseButton(std::string &type);
 
         std::map<std::string, std::string> OutputRegs();
         std::map<std::string, std::string> OutputCSRs();

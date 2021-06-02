@@ -37,6 +37,14 @@ const std::string CAutoRunner::U_BUTTON_STRING = "UBtn";
 const std::string CAutoRunner::I_BUTTON_STRING = "IBtn";
 const std::string CAutoRunner::J_BUTTON_STRING = "JBtn";
 const std::string CAutoRunner::K_BUTTON_STRING = "KBtn";
+const std::string CAutoRunner::DIRECTION_UP_RELEASE_STRING = "DirectionUpRelease";
+const std::string CAutoRunner::DIRECTION_DOWN_RELEASE_STRING = "DirectionDownRelease";
+const std::string CAutoRunner::DIRECTION_LEFT_RELEASE_STRING = "DirectionLeftRelease";
+const std::string CAutoRunner::DIRECTION_RIGHT_RELEASE_STRING = "DirectionRightRelease";
+const std::string CAutoRunner::U_BUTTON_RELEASE_STRING = "UBtnRelease";
+const std::string CAutoRunner::I_BUTTON_RELEASE_STRING = "IBtnRelease";
+const std::string CAutoRunner::J_BUTTON_RELEASE_STRING = "JBtnRelease";
+const std::string CAutoRunner::K_BUTTON_RELEASE_STRING = "KBtnRelease";
 const std::string CAutoRunner::INSERT_FW_STRING = "InsertFW";
 const std::string CAutoRunner::INSERT_CR_STRING = "InsertCart";
 const std::string CAutoRunner::REMOVE_CR_STRING = "RemoveCart";
@@ -121,8 +129,8 @@ void CAutoRunner::ParseCommandData() {
 
                 const rapidjson::Value& CMD = Commands[i];
 
-                if (CMD.HasMember(CYCLE_STRING.c_str()) && CMD[CYCLE_STRING.c_str()].IsInt()) {
-                    CurrentCycle = CMD[CYCLE_STRING.c_str()].GetInt();
+                if (CMD.HasMember(CYCLE_STRING.c_str()) && CMD[CYCLE_STRING.c_str()].IsUint()) {
+                    CurrentCycle = CMD[CYCLE_STRING.c_str()].GetUint();
                 }
 
                 if (CMD.HasMember(TYPE_STRING.c_str()) && CMD[TYPE_STRING.c_str()].IsString()) {
@@ -136,8 +144,8 @@ void CAutoRunner::ParseCommandData() {
                 
                 if (i + 1 < len) {
                     const rapidjson::Value &NextCMD = Commands[i+1];
-                    if (NextCMD.HasMember(CYCLE_STRING.c_str()) && NextCMD[CYCLE_STRING.c_str()].IsInt()) {
-                        NextCycle = NextCMD[CYCLE_STRING.c_str()].GetInt();
+                    if (NextCMD.HasMember(CYCLE_STRING.c_str()) && NextCMD[CYCLE_STRING.c_str()].IsUint()) {
+                        NextCycle = NextCMD[CYCLE_STRING.c_str()].GetUint();
                     }
                 }else {
                     NextCycle = CurrentCycle;
@@ -163,6 +171,22 @@ bool CAutoRunner::IsNumberButton(std::string &type) {
     }
     return false;
 }
+
+bool CAutoRunner::IsDirectionReleaseButton(std::string &type) {
+    if (type == DIRECTION_UP_RELEASE_STRING || type == DIRECTION_DOWN_RELEASE_STRING || \
+        type == DIRECTION_LEFT_RELEASE_STRING || type == DIRECTION_RIGHT_RELEASE_STRING) {
+            return true;
+        }
+    return false;
+}
+
+bool CAutoRunner::IsNumberReleaseButton(std::string &type) {
+    if (type == U_BUTTON_RELEASE_STRING || type == I_BUTTON_RELEASE_STRING || \
+        type == J_BUTTON_RELEASE_STRING || type == K_BUTTON_RELEASE_STRING){
+        return true;
+    }
+    return false;
+}
     
 void CAutoRunner::OutputJSONFile() {
     rapidjson::Document::AllocatorType &OutputAllocator = DOutputJSONDocument.GetAllocator();
@@ -180,29 +204,20 @@ void CAutoRunner::SendCommand(uint32_t cycle, uint32_t nextCycle, std::string &t
     if (type == INSERT_FW_STRING) {
         InsertFW(data);
         DoPowerOn();
-        DoCycleSteps(cycle, nextCycle);
     }else if (type == INSERT_CR_STRING) {
         InsertCR(data);
-        DoCycleSteps(cycle, nextCycle);
     }else if (type == REMOVE_CR_STRING) {
         RemoveCR();
-        DoCycleSteps(cycle, nextCycle);
-    }else if (IsDirectionButton(type) || IsNumberButton(type)) {
-        for (uint32_t i=0; i<(nextCycle - cycle); i++) {
-            if (IsDirectionButton(type)){
-                PressDirection(type);
-            }
-
-            if (IsNumberButton(type)){
-                PressDirection(type);
-            }
-            DoStep();
-        }
+    }else if (IsDirectionButton(type)){
+        PressDirection(type);
+    }else if (IsNumberButton(type)) {
+        PressButton(type);
+    }else if (IsDirectionReleaseButton(type)) {
         ReleaseDirection(type);
-        ReleaseButton(type);
+    }else if (IsNumberReleaseButton(type)){
+        ReleaseButton(type);  
     }else if (type == CMD_BUTTON_STRING) {
         PressCommand();
-        DoCycleSteps(cycle, nextCycle);
     }else if (type == OUTPUT_REG_STRING) {
         std::map<std::string, std::string> outRegs = OutputRegs();
         rapidjson::Document::AllocatorType &OutputAllocator = DOutputJSONDocument.GetAllocator();
@@ -211,7 +226,6 @@ void CAutoRunner::SendCommand(uint32_t cycle, uint32_t nextCycle, std::string &t
         temp.AddMember("Cycle", cycle, OutputAllocator);
         temp.AddMember("Regs", outRegJsonVal, OutputAllocator);
         DOutputJSONObjectArray.PushBack(temp, OutputAllocator);
-        DoCycleSteps(cycle, nextCycle);
     }else if (type == OUTPUT_CSR_STRING) {
         std::map<std::string, std::string> outCSRs = OutputCSRs();
         rapidjson::Document::AllocatorType &OutputAllocator = DOutputJSONDocument.GetAllocator();
@@ -220,7 +234,6 @@ void CAutoRunner::SendCommand(uint32_t cycle, uint32_t nextCycle, std::string &t
         temp.AddMember("Cycle", cycle, OutputAllocator);
         temp.AddMember("CSRs", outCSRJsonVal, OutputAllocator);
         DOutputJSONObjectArray.PushBack(temp, OutputAllocator);
-        DoCycleSteps(cycle, nextCycle);
     }else if (type == OUTPUT_MEM_STRING) {
         std::map<std::string, std::string> outMem = OutputMem(data);
         rapidjson::Document::AllocatorType &OutputAllocator = DOutputJSONDocument.GetAllocator();
@@ -229,8 +242,8 @@ void CAutoRunner::SendCommand(uint32_t cycle, uint32_t nextCycle, std::string &t
         temp.AddMember("Cycle", cycle, OutputAllocator);
         temp.AddMember("Mem", outMemJsonVal, OutputAllocator);
         DOutputJSONObjectArray.PushBack(temp, OutputAllocator);
-        DoCycleSteps(cycle, nextCycle);
     }
+    DoCycleSteps(cycle, nextCycle);
 }
 
 
