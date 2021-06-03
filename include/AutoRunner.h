@@ -1,10 +1,9 @@
 #ifndef AUTO_RUNNER_H
 #define AUTO_RUNNER_H
 
+#define RAPIDJSON_HAS_STDSTRING 1
+#define RAPIDJSON_HAS_CXX11_RVALUE_REFS 1
 #include "rapidjson/document.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 #include "RISCVConsole.h"
 
 #include <iostream>
@@ -32,20 +31,20 @@ class CAutoRunner {
         static const std::string DIRECTION_LEFT_STRING;
         static const std::string DIRECTION_RIGHT_STRING;
 
+        static const std::string BUTTON_1_STRING;
+        static const std::string BUTTON_2_STRING;
+        static const std::string BUTTON_3_STRING;
+        static const std::string BUTTON_4_STRING;
+
         static const std::string DIRECTION_UP_RELEASE_STRING;
         static const std::string DIRECTION_DOWN_RELEASE_STRING;
         static const std::string DIRECTION_LEFT_RELEASE_STRING;
         static const std::string DIRECTION_RIGHT_RELEASE_STRING;
 
-        static const std::string U_BUTTON_RELEASE_STRING;
-        static const std::string I_BUTTON_RELEASE_STRING;
-        static const std::string J_BUTTON_RELEASE_STRING;
-        static const std::string K_BUTTON_RELEASE_STRING;
-
-        static const std::string U_BUTTON_STRING;
-        static const std::string I_BUTTON_STRING;
-        static const std::string J_BUTTON_STRING;
-        static const std::string K_BUTTON_STRING;
+        static const std::string BUTTON_1_RELEASE_STRING;
+        static const std::string BUTTON_2_RELEASE_STRING;
+        static const std::string BUTTON_3_RELEASE_STRING;
+        static const std::string BUTTON_4_RELEASE_STRING;
 
         static const std::string INSERT_FW_STRING;
         static const std::string INSERT_CR_STRING;
@@ -56,9 +55,12 @@ class CAutoRunner {
         static const std::string OUTPUT_REG_STRING;
         static const std::string OUTPUT_CSR_STRING;
         static const std::string OUTPUT_MEM_STRING;
+        static const std::string OUTPUTS_STRING;
         
+        static const std::string REGS_STRING;
+        static const std::string CSRS_STRING;
+        static const std::string MEM_STRING;
 
-        std::string DJSONFilePath = "/code/autorunner/files/";
         std::string DInputJSONPath;
         std::string DOutputJSONPath;
 
@@ -68,34 +70,33 @@ class CAutoRunner {
 
         std::shared_ptr<CRISCVConsole> DRISCVConsole;
 
-        rapidjson::Document GetInputJSONDocument();
+        bool LoadInputJSONDocument();
 
         void ParseArguments(int &argc, char *argv[]);
         void ParseInitData();
         void ParseCommandData();
-        void SendCommand(uint32_t cycle, uint32_t nextCycle, std::string &type, std::string &data);
+        void SendCommand(uint32_t cycle, uint32_t nextCycle, const std::string &type, const std::string &data);
 
         void OutputJSONFile();
 
-        bool InsertFW(std::string &data);
-        bool InsertCR(std::string &data);
+        bool InsertFW(const std::string &data);
+        bool InsertCR(const std::string &data);
         bool RemoveCR();
 
-        bool PressDirection(std::string &type);
-        bool ReleaseDirection(std::string &type);
-        bool PressButton(std::string &type);
-        bool ReleaseButton(std::string &type);
+        bool PressDirection(const std::string &type);
+        bool ReleaseDirection(const std::string &type);
+        bool PressButton(const std::string &type);
+        bool ReleaseButton(const std::string &type);
         bool PressCommand();
         
-        bool IsDirectionButton(std::string &type);
-        bool IsNumberButton(std::string &type);
-
-        bool IsDirectionReleaseButton(std::string &type);
-        bool IsNumberReleaseButton(std::string &type);
+        bool IsDirectionButton(const std::string &type);
+        bool IsDirectionReleaseButton(const std::string &type);
+        bool IsNumberButton(const std::string &type);
+        bool IsNumberReleaseButton(const std::string &type);
 
         std::map<std::string, std::string> OutputRegs();
         std::map<std::string, std::string> OutputCSRs();
-        std::map<std::string, std::string> OutputMem(std::string &data);
+        std::map<std::string, std::string> OutputMem(const std::string &data);
 
         bool DoStep();
         bool DoRun();
@@ -104,7 +105,7 @@ class CAutoRunner {
         bool DoPowerOff();
         bool DoCycleSteps(uint32_t cycle, uint32_t nextCycle);
 
-        uint32_t GetAddHex(std::string strAdd);
+        uint32_t GetAddressHex(const std::string &str_addr);
         rapidjson::Value FormatOutputMap(std::map<std::string, std::string> map, rapidjson::Document::AllocatorType &allocator);
         std::string FormatHex32Bit(uint32_t val);
         
