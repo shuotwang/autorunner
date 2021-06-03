@@ -232,6 +232,8 @@ void CAutoRunner::SendCommand(uint64_t cycle, uint64_t nextCycle, const std::str
         temp.AddMember(rapidjson::StringRef(CYCLE_STRING), cycle, OutputAllocator);
         temp.AddMember(rapidjson::StringRef(MEM_STRING), outMemJsonVal, OutputAllocator);
         DOutputJSONObjectArray.PushBack(temp, OutputAllocator);
+    } else {
+        std::cout << type << ": unidentifiable command type" << std::endl;
     }
     DoCycleSteps(cycle, nextCycle);
 }
