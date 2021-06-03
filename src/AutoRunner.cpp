@@ -119,8 +119,8 @@ void CAutoRunner::ParseCommandData(){
         if(Commands.IsArray()){
             size_t len = Commands.Size();
             for (size_t i = 0; i < len; i++){
-                uint32_t CurrentCycle = 0;
-                uint32_t NextCycle = 0;
+                uint64_t CurrentCycle = 0;
+                uint64_t NextCycle = 0;
                 std::string Type = "";
                 std::string Data = "";
 
@@ -145,7 +145,8 @@ void CAutoRunner::ParseCommandData(){
                 else {
                     NextCycle = CurrentCycle;
                 }
-                SendCommand(CurrentCycle, NextCycle, Type, Data);                    
+                std::cout << "At " << CurrentCycle << ", Do " << Type << std::endl;
+                SendCommand(CurrentCycle, NextCycle, Type, Data);                
             }
         }
     }
@@ -179,7 +180,7 @@ void CAutoRunner::OutputJSONFile(){
 	fclose(f);
 }
 
-void CAutoRunner::SendCommand(uint32_t cycle, uint32_t nextCycle, const std::string &type, const std::string &data){
+void CAutoRunner::SendCommand(uint64_t cycle, uint64_t nextCycle, const std::string &type, const std::string &data){
     if(type == INSERT_FW_STRING){
         InsertFW(data);
         DoPowerOn();
@@ -424,8 +425,8 @@ bool CAutoRunner::DoPowerOff(){
     return true;
 }
 
-bool CAutoRunner::DoCycleSteps(uint32_t cycle, uint32_t nextCycle){
-    for (uint32_t i=0; i < (nextCycle - cycle); i++){
+bool CAutoRunner::DoCycleSteps(uint64_t cycle, uint64_t nextCycle){
+    for (uint64_t i=0; i < (nextCycle - cycle); i++){
         DoStep();
     }
     return true;

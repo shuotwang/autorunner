@@ -75,7 +75,7 @@ class CAutoRunner {
         void ParseArguments(int &argc, char *argv[]);
         void ParseInitData();
         void ParseCommandData();
-        void SendCommand(uint32_t cycle, uint32_t nextCycle, const std::string &type, const std::string &data);
+        void SendCommand(uint64_t cycle, uint64_t nextCycle, const std::string &type, const std::string &data);
 
         void OutputJSONFile();
 
@@ -103,7 +103,7 @@ class CAutoRunner {
         bool DoStop();
         bool DoPowerOn();
         bool DoPowerOff();
-        bool DoCycleSteps(uint32_t cycle, uint32_t nextCycle);
+        bool DoCycleSteps(uint64_t cycle, uint64_t nextCycle);
 
         uint32_t GetAddressHex(const std::string &str_addr);
         rapidjson::Value FormatOutputMap(std::map<std::string, std::string> map, rapidjson::Document::AllocatorType &allocator);

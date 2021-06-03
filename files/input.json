@@ -4,32 +4,111 @@
     "VideoMS" : 10,
     "CPUFreq" : 10000000
     },
-  "Commands": [ 
+  "Commands": [
     {
-      "Cycle":0,
-      "Type":"InsertFW",
-      "Data":"/code/autorunner/files/firmware"
+        "Cycle": 0,
+        "Type": "InsertFW",
+        "Data": "/code/autorunner/files/firmware"
     },
     {
-      "Cycle":3955000,
-      "Type":"OutputMem",
-      "Data":"0x500FE800-0x500FE80F"
-    },  
-    {
-      "Cycle":4000000,
-      "Type":"InsertCart",
-      "Data":"/code/autorunner/files/cartridge"
+        "Cycle": 30723138,
+        "Type": "InsertCR",
+        "Data": "/code/autorunner/files/cartridge"
     },
     {
-      "Cycle":4000000,
-      "Type":"OutputMem",
-      "Data":"0x500FF214-0x500FF217"
+        "Cycle": 48216286,
+        "Type": "DirectionDown",
+        "Data": ""
     },
     {
-      "Cycle":4000520,
-      "Type":"OutputMem",
-      "Data":"0x500FF414-0x500FF417"
+        "Cycle": 52217471,
+        "Type": "DirectionDownRelease",
+        "Data": ""
+    },
+    {
+        "Cycle": 55959374,
+        "Type": "DirectionUp",
+        "Data": ""
+    },
+    {
+        "Cycle": 60240058,
+        "Type": "DirectionUpRelease",
+        "Data": ""
+    },
+    {
+        "Cycle": 105334517,
+        "Type": "DirectionLeft",
+        "Data": ""
+    },
+    {
+        "Cycle": 111087977,
+        "Type": "DirectionLeftRelease",
+        "Data": ""
+    },
+    {
+        "Cycle": 122011872,
+        "Type": "DirectionRight",
+        "Data": ""
+    },
+    {
+        "Cycle": 127923120,
+        "Type": "DirectionRightRelease",
+        "Data": ""
+    },
+    {
+        "Cycle": 221897000,
+        "Type": "Button1",
+        "Data": ""
+    },
+    {
+        "Cycle": 223908009,
+        "Type": "Button1Release",
+        "Data": ""
+    },
+    {
+        "Cycle": 233803010,
+        "Type": "Button2",
+        "Data": ""
+    },
+    {
+        "Cycle": 238800008,
+        "Type": "Button2Release",
+        "Data": ""
+    },
+    {
+        "Cycle": 241595441,
+        "Type": "Button3",
+        "Data": ""
+    },
+    {
+        "Cycle": 245470119,
+        "Type": "Button3Release",
+        "Data": ""
+    },
+    {
+        "Cycle": 251773401,
+        "Type": "Button4",
+        "Data": ""
+    },
+    {
+        "Cycle": 254793624,
+        "Type": "Button4Release",
+        "Data": ""
+    },
+    {
+        "Cycle": 259382891,
+        "Type": "OutputRegs",
+        "Data": ""
+    },
+    {
+        "Cycle": 259382891,
+        "Type": "OutputCSRs",
+        "Data": ""
+    },
+    {
+        "Cycle": 259382891,
+        "Type": "OutputMem",
+        "Data": "0x500FE110-0x500FE11F"
     }
-  
   ]
 }  
